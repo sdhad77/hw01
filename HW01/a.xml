@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="myfile.xsl" ?>
+<bookstore specialty="novel">
+  <book style="autobiography">
+    <author>
+      <first-name>Joe</first-name>
+      <last-name>Bob</last-name>
+      <award>Trenton Literary Review Honorable Mention</award>
+    </author>
+    <price>12</price>
+  </book>
+</bookstore>
