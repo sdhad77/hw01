@@ -1,11 +1,10 @@
 //============================================================================
 // Name        : HW01.cpp
-// Author      : 
+// Author      :
 // Version     :
 // Copyright   : Your copyright notice
 // Description : Hello World in C++, Ansi-style
 //============================================================================
-
 #include <iostream>
 #include <fstream>
 #include "XMLNode.h"
@@ -14,6 +13,7 @@ using namespace std;
 
 #define MAX_CHAR_SIZE 100
 #define MAX_BUF_SIZE 500
+
 
 bool checkAlpha(const char ch)
 {
@@ -62,6 +62,7 @@ int main()
 {
 	char* fileName	= 	new char[MAX_CHAR_SIZE];
 	char* tempElement =	new char[MAX_CHAR_SIZE];
+	char* cmdBuf 	= 	new char[MAX_CHAR_SIZE];
 	char* buf 		= 	new char[MAX_BUF_SIZE];
 	char* tempBuf 	= 	new char[MAX_BUF_SIZE];
 
@@ -69,8 +70,7 @@ int main()
 	int startIdx = 0;
 	int endIdx = 0;
 	bool isRoute = true;
-
-	int depth = 0;
+	bool isEmptyTag = false;
 
 	XMLNode* XpathRoute = new XMLNode;
 
@@ -89,7 +89,7 @@ int main()
 		idx = 0;
 		while(buf[idx] != '\0')
 		{
-			while(buf[idx] == ' ') idx++; // °ø¹é °Ç³Ê¶Ù±â
+			while(buf[idx] == ' ') idx++; // ê³µë°± ê±´ë„ˆë›°ê¸°
 
 			if(buf[idx] == '<')
 			{
@@ -100,16 +100,17 @@ int main()
 				tempBuf[endIdx] = '\0';
 				idx = endIdx + startIdx + 1;
 
+				isEmptyTag = false;
+				if(tempBuf[endIdx-1] == '/') isEmptyTag = true;
+
 				if(tempBuf[0] == '?') cout << "Processing Instruction" << endl;
 				else if(tempBuf[0] == '!') cout << "DTD" << endl;
 				else if(tempBuf[0] == '/')
 				{
-					cout << depth << "/agName : " << XpathRoute->getTagName() << endl;
 					XpathRoute = XpathRoute->getParentNode();
-					depth--;
 				}
 				else
-				{//ÀÏ¹Ý ÅÂ±× Ã³¸®
+				{//ì¼ë°˜ íƒœê·¸ ì²˜ë¦¬
 					int blankNum = checkBlank(&tempBuf[0]);
 					strncpy(tempElement, &tempBuf[0], blankNum);
 					tempElement[blankNum] = '\0';
@@ -118,9 +119,6 @@ int main()
 						isRoute = false;
 						XpathRoute->setParentNode(XpathRoute);
 						XpathRoute->setTagName(tempElement);
-						XpathRoute->setContentName("test");
-						depth++;
-						cout << depth << "RouteTagName : " << XpathRoute->getTagName() << endl;
 					}
 					else
 					{
@@ -128,27 +126,21 @@ int main()
 						XMLNode* currentNode = XpathRoute;
 						temp.setTagName(tempElement);
 						XpathRoute->setChildNode(&temp);
-						XpathRoute = XpathRoute->getChildNode();
+						XpathRoute = &XpathRoute->getChildNode()->back();
 						XpathRoute->setParentNode(currentNode);
 
-						depth++;
-						cout << depth << "tagName : " << XpathRoute->getTagName() << endl;
+						if(isEmptyTag) XpathRoute = XpathRoute->getParentNode();
 					}
-
-
-					//================attribute ÀúÀå Ãß°¡ÇØ¾ßÇÔ=============
+					//================attribute ì €ìž¥ ì¶”ê°€í•´ì•¼í•¨=============
 				}
-				//=================ºó ÅÂ±× Ã³¸® ±â´É Ãß°¡ÇØ¾ßÇÔ==================
 			}
 			else if(checkAlpha(buf[idx]) || checkNumber(buf[idx]))
-			{//Content Ã³¸®
+			{//Content ì²˜ë¦¬
 				endIdx = checkStartPoint(&buf[idx]);
 				strncpy(tempBuf, &buf[idx], endIdx);
 				tempBuf[endIdx] = '\0';
 				idx = idx + endIdx;
-				XpathRoute->setContentName(tempBuf);
-
-				cout << depth << "content : " << XpathRoute->getContentName() << endl;
+				XpathRoute->setContent(tempBuf);
 			}
 			else
 			{
@@ -160,14 +152,51 @@ int main()
 
 	fin.close();
 
+	while(1)
+	{
+		cout << "cmd : ";
+		cin >> cmdBuf;
+
+		if(!strcmp(cmdBuf, "quit")) break;
+		else if(!strcmp(cmdBuf, "up")) XpathRoute = XpathRoute->getParentNode();
+		else if(!strcmp(cmdBuf, "down"))
+		{
+			cout << "child name : ";
+			cin >> cmdBuf;
+
+			bool searchComplete = false;
+			list<XMLNode>::iterator iter;
+			for(iter = XpathRoute->getChildNode()->begin(); iter != XpathRoute->getChildNode()->end(); iter++)
+			{
+				if(!strcmp(cmdBuf, iter->getTagName()))
+				{
+					searchComplete = true;
+					XpathRoute = &(*iter);
+					break;
+				}
+			}
+			if(!searchComplete) cout << "fail" << endl;
+		}
+		else if(!strcmp(cmdBuf, "print"))
+		{
+			cout << "tagName : " << XpathRoute->getTagName() << endl;
+			cout << "content : " << XpathRoute->getContent() << endl;
+		}
+		else cout << "cmd error" << endl;
+
+	}
+
 	delete[] fileName;
 	delete[] tempElement;
+	delete[] cmdBuf;
 	delete[] buf;
 	delete[] tempBuf;
 
-/*	cout << "press any key.." << endl;
+	/*
+	cout << "press any key.." << endl;
 	cin.ignore();
 	cin.get();
-*/
+	*/
+
 	return 0;
 }

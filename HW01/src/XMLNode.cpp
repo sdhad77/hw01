@@ -11,12 +11,16 @@ XMLNode::XMLNode() {
 	tagName = new char[MAX_CHAR_SIZE];
 	content = new char[MAX_CHAR_SIZE];
 	parentNode = 0;
+	tagName[0] = '\0';
+	content[0] = '\0';
 }
 
 XMLNode::XMLNode(const XMLNode& node)
 {
 	tagName = new char[MAX_CHAR_SIZE];
 	content = new char[MAX_CHAR_SIZE];
+	tagName[0] = '\0';
+	content[0] = '\0';
 
 	strcpy(tagName, node.tagName);
 	strcpy(content, node.content);
@@ -38,12 +42,12 @@ void XMLNode::setTagName(const char* _tagName)
 	strcpy(tagName, _tagName);
 }
 
-char* XMLNode::getContentName()
+char* XMLNode::getContent()
 {
 	return content;
 }
 
-void XMLNode::setContentName(const char* _content)
+void XMLNode::setContent(const char* _content)
 {
 	strcpy(content, _content);
 }
@@ -57,9 +61,9 @@ void XMLNode::setParentNode(XMLNode* _parentNode)
 	parentNode = _parentNode;
 }
 
-XMLNode* XMLNode::getChildNode()
+std::list<XMLNode>* XMLNode::getChildNode()
 {
-	return &childNode.back();
+	return &childNode;
 }
 
 void XMLNode::setChildNode(const XMLNode* _childNode)
