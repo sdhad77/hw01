@@ -73,6 +73,7 @@ int main()
 	bool isEmptyTag = false;
 
 	XMLNode* XpathRoute = new XMLNode;
+	list<XMLNode>::iterator iter;
 
 	cout << "Input FileName : ";
 	cin >> fileName;
@@ -89,7 +90,7 @@ int main()
 		idx = 0;
 		while(buf[idx] != '\0')
 		{
-			while(buf[idx] == ' ') idx++; // ê³µë°± ê±´ë„ˆë›°ê¸°
+			while(buf[idx] == ' ') idx++; // °ø¹é¹®ÀÚ Á¦°Å
 
 			if(buf[idx] == '<')
 			{
@@ -110,7 +111,7 @@ int main()
 					XpathRoute = XpathRoute->getParentNode();
 				}
 				else
-				{//ì¼ë°˜ íƒœê·¸ ì²˜ë¦¬
+				{//ÀÏ¹ÝÅÂ±× Ã³¸®
 					int blankNum = checkBlank(&tempBuf[0]);
 					strncpy(tempElement, &tempBuf[0], blankNum);
 					tempElement[blankNum] = '\0';
@@ -131,11 +132,11 @@ int main()
 
 						if(isEmptyTag) XpathRoute = XpathRoute->getParentNode();
 					}
-					//================attribute ì €ìž¥ ì¶”ê°€í•´ì•¼í•¨=============
+					//================attribute Ã³¸®±â´É Ãß°¡=============
 				}
 			}
 			else if(checkAlpha(buf[idx]) || checkNumber(buf[idx]))
-			{//Content ì²˜ë¦¬
+			{//Content Ã³¸®
 				endIdx = checkStartPoint(&buf[idx]);
 				strncpy(tempBuf, &buf[idx], endIdx);
 				tempBuf[endIdx] = '\0';
@@ -145,6 +146,7 @@ int main()
 			else
 			{
 				cout << "error2" << endl;
+				cout << buf << endl;
 				return 2;
 			}
 		}
@@ -165,7 +167,6 @@ int main()
 			cin >> cmdBuf;
 
 			bool searchComplete = false;
-			list<XMLNode>::iterator iter;
 			for(iter = XpathRoute->getChildNode()->begin(); iter != XpathRoute->getChildNode()->end(); iter++)
 			{
 				if(!strcmp(cmdBuf, iter->getTagName()))
@@ -181,6 +182,12 @@ int main()
 		{
 			cout << "tagName : " << XpathRoute->getTagName() << endl;
 			cout << "content : " << XpathRoute->getContent() << endl;
+			cout << "childNodeSize : " << XpathRoute->getChildNode()->size() << endl;
+			for(iter = XpathRoute->getChildNode()->begin(); iter != XpathRoute->getChildNode()->end(); iter++)
+			{
+				cout << &(*iter->getTagName()) << " ";
+			}
+			cout << endl;
 		}
 		else cout << "cmd error" << endl;
 
