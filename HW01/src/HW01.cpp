@@ -13,10 +13,34 @@ using namespace std;
 #define MAX_CHAR_SIZE 100
 #define MAX_BUF_SIZE 500
 
+void printAll(XMLNode* _XpathRoute)
+{
+	list<XMLNode>::iterator _iter;
+	cout << _XpathRoute->getTagName() << endl;
+	for(_iter = _XpathRoute->getChildNode()->begin(); _iter != _XpathRoute->getChildNode()->end(); _iter++)
+	{
+		printAll(&(*_iter));
+	}
+	return ;
+}
+
+void searchAll(XMLNode* _XpathRoute, const char* str)
+{
+	list<XMLNode>::iterator _iter;
+	if(!strcmp(_XpathRoute->getTagName(), str)) cout << str << " ¹ß°ß" << endl;
+
+	for(_iter = _XpathRoute->getChildNode()->begin(); _iter != _XpathRoute->getChildNode()->end(); _iter++)
+	{
+		searchAll(&(*_iter),str);
+	}
+	return ;
+}
+
 int main()
 {
 	char* fileName	= 	new char[MAX_CHAR_SIZE];
 	char* cmdBuf 	= 	new char[MAX_CHAR_SIZE];
+	int cmdIdx		=	0;
 
 	XMLParser XParser;
 	XMLNode* XpathRoute = new XMLNode;
@@ -34,11 +58,35 @@ int main()
 
 	while(1)
 	{
+		cmdIdx = 0;
 		cout << "cmd : ";
 		cin >> cmdBuf;
 
 		if(!strcmp(cmdBuf, "quit")) break;
-		else if(!strcmp(cmdBuf, "up")) XpathRoute = XpathRoute->getParentNode();
+		else
+		{
+			searchAll(XpathRoute,cmdBuf);
+			/*
+			while(cmdBuf[cmdIdx] != '\0')
+			{
+				if(cmdBuf[cmdIdx] == '/')
+				{
+					if(cmdBuf[cmdIdx+1] == '/')
+					{
+						while(cmdBuf[cmdIdx+2] != '\0' && cmdBuf[cmdIdx+2] != '/')
+						{
+							cout << cmdBuf[cmdIdx+2];
+							cmdIdx++;
+						}
+						cout << endl;
+						cmdIdx += 1;
+					}
+				}
+				else cout << cmdBuf[cmdIdx] << endl;
+				cmdIdx++;
+			}*/
+		}
+/*		else if(!strcmp(cmdBuf, "up")) XpathRoute = XpathRoute->getParentNode();
 		else if(!strcmp(cmdBuf, "down"))
 		{
 			cout << "child name : ";
@@ -80,7 +128,7 @@ int main()
 				}
 			}
 		}
-		else cout << "cmd error" << endl;
+*/
 	}
 
 	delete[] fileName;
