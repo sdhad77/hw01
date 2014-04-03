@@ -70,3 +70,13 @@ void XMLNode::setChildNode(const XMLNode* _childNode)
 {
 	childNode.push_back(*_childNode);
 }
+
+std::list<tagAttribute>* XMLNode::getAttribute()
+{
+	return &attribute;
+}
+
+void XMLNode::setAttribute(const tagAttribute* _attribute)
+{
+	attribute.push_back(*_attribute);
+}
