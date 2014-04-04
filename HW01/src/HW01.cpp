@@ -27,7 +27,10 @@ void printAll(XMLNode* _XpathRoute)
 void searchAll(XMLNode* _XpathRoute, const char* str)
 {
 	list<XMLNode>::iterator _iter;
-	if(!strcmp(_XpathRoute->getTagName(), str)) cout << str << " ¹ß°ß" << endl;
+	if(!strcmp(_XpathRoute->getTagName(), str))
+	{
+		cout << _XpathRoute->getTagName() << "\t" << _XpathRoute->getContent() << endl;
+	}
 
 	for(_iter = _XpathRoute->getChildNode()->begin(); _iter != _XpathRoute->getChildNode()->end(); _iter++)
 	{

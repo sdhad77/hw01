@@ -44,22 +44,16 @@ bool XMLParser::checkNumber(const char ch)
 	else return false;
 }
 
-int XMLParser::checkBlank(const char* str)
+int XMLParser::checkChar(const char* str, const char _ch)
 {
 	int _idx = 0;
 	while (str[_idx] != '\0')
 	{
-		if (str[_idx] == ' ') return _idx;
+		if(str[_idx] == _ch) return _idx;
 		_idx++;
 	}
 
-	return _idx;
-}
-
-int XMLParser::checkChar(const char* str, const char _ch)
-{
-	int _idx = 0;
-	while (str[_idx] != _ch) _idx++;
+	if(_ch == '>') return -1; // 태그 닫는 기호를 찾지 못했을때 에러 처리를 위함
 
 	return _idx;
 }
@@ -76,7 +70,7 @@ void XMLParser::parserDTD()
 
 void XMLParser::parserStartTag()
 {
-	int blankNum = checkBlank(&tempBuf[0]);
+	int blankNum = checkChar(&tempBuf[0], ' ');
 	strncpy(tempElement, &tempBuf[0], blankNum);
 	tempElement[blankNum] = '\0';
 
@@ -172,6 +166,12 @@ int XMLParser::parser(const char* fileName, XMLNode* _XMLNode)
 				idx++;
 				startIdx = idx;
 				endIdx = checkChar(&buf[startIdx], '>');
+				while(endIdx == -1)
+				{
+					fin.getline(tempBuf, MAX_BUF_SIZE);
+					strcat(buf,tempBuf);
+					endIdx = checkChar(&buf[startIdx], '>');
+				}
 				strncpy(tempBuf, &buf[startIdx], endIdx);
 				tempBuf[endIdx] = '\0';
 				idx = endIdx + startIdx + 1; //현재 태그의 끝+1로 인덱스 이동시킴

@@ -49,7 +49,12 @@ char* XMLNode::getContent()
 
 void XMLNode::setContent(const char* _content)
 {
-	strcpy(content, _content);
+	if(content[0] != '\0')
+	{
+		strcat(content, " ");
+		strcat(content, _content);
+	}
+	else strcpy(content, _content);
 }
 
 XMLNode* XMLNode::getParentNode()

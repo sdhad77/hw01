@@ -23,7 +23,6 @@ public:
 
 	bool checkAlpha(const char ch);
 	bool checkNumber(const char ch);
-	int checkBlank(const char* str);
 	int checkChar(const char* str, const char _ch);
 	int parser(const char* fileName, XMLNode* _XMLNode);
 	void parserPI();
