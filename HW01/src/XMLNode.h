@@ -58,6 +58,8 @@ private:
 	std::list<XMLNode> childNode;
 
 public:
+	int checkChar(const char* str, const char _ch);
+	char* checkAmp(char* str);
 	char* getTagName();
 	void setTagName(const char* _tagName);
 	char* getContent();

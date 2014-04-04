@@ -65,7 +65,13 @@ void XMLParser::parserPI()
 
 void XMLParser::parserDTD()
 {
-	cout << "DTD" << endl;
+	if(tempBuf[1] == '-' && tempBuf[2] == '-') parserComment();
+	else cout << "DTD" << endl;
+}
+
+void XMLParser::parserComment()
+{
+	cout << "Comment" << endl;
 }
 
 void XMLParser::parserStartTag()
@@ -134,12 +140,14 @@ void XMLParser::parserAttribute(int _blankNum)
 			tempAttributeValue[_endIdx] = '\0';
 			tempAttribute.setValue(tempAttributeValue);
 
+			XpathRoute->checkAmp(tempAttribute.getName());
+			XpathRoute->checkAmp(tempAttribute.getValue());
 			XpathRoute->setAttribute(&tempAttribute);
 
 			_blankNum = _startIdx + _endIdx + 1;
 		}
-		if(tempBuf[_blankNum] == '\0') break;
-		else if(tempBuf[_blankNum] == '/' && tempBuf[_blankNum+1] == '\0') break;
+		if(tempBuf[_blankNum] == '\0') break; //일반 태그
+		else if(tempBuf[_blankNum] == '/' && tempBuf[_blankNum+1] == '\0') break; //빈 태그 일 경우
 	}
 }
 
@@ -177,7 +185,7 @@ int XMLParser::parser(const char* fileName, XMLNode* _XMLNode)
 				idx = endIdx + startIdx + 1; //현재 태그의 끝+1로 인덱스 이동시킴
 
 				if		(tempBuf[0] == '?')	parserPI();
-				else if	(tempBuf[0] == '!')	parserDTD();
+				else if	(tempBuf[0] == '!') parserDTD(); // comment도 같이 처리함
 				else if	(tempBuf[0] == '/')	parserEndTag();
 				else						parserStartTag();
 			}

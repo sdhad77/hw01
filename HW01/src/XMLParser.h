@@ -27,6 +27,7 @@ public:
 	int parser(const char* fileName, XMLNode* _XMLNode);
 	void parserPI();
 	void parserDTD();
+	void parserComment();
 	void parserStartTag();
 	void parserEndTag();
 	void parserContent();

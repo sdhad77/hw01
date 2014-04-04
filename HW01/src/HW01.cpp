@@ -13,28 +13,38 @@ using namespace std;
 #define MAX_CHAR_SIZE 100
 #define MAX_BUF_SIZE 500
 
-void printAll(XMLNode* _XpathRoute)
+enum commandType { search_TagName, search_Attribute};
+
+void searchAll(XMLNode* _XpathRoute, const char* str, commandType _commandType)
 {
 	list<XMLNode>::iterator _iter;
-	cout << _XpathRoute->getTagName() << endl;
+	list<tagAttribute>::iterator _iter2;
+
+	if(_commandType == search_Attribute)
+	{
+		for(_iter2 = _XpathRoute->getAttribute()->begin(); _iter2 != _XpathRoute->getAttribute()->end(); _iter2++)
+		{
+			if(!strcmp(_iter2->getName(), str))
+			{
+				cout << _iter2->getName() << "\t" << _iter2->getValue() << endl;
+			}
+			else if(!strcmp(_iter2->getValue(), str))
+			{
+				cout << _iter2->getName() << "\t" << _iter2->getValue() << endl;
+			}
+		}
+	}
+
 	for(_iter = _XpathRoute->getChildNode()->begin(); _iter != _XpathRoute->getChildNode()->end(); _iter++)
 	{
-		printAll(&(*_iter));
-	}
-	return ;
-}
-
-void searchAll(XMLNode* _XpathRoute, const char* str)
-{
-	list<XMLNode>::iterator _iter;
-	if(!strcmp(_XpathRoute->getTagName(), str))
-	{
-		cout << _XpathRoute->getTagName() << "\t" << _XpathRoute->getContent() << endl;
-	}
-
-	for(_iter = _XpathRoute->getChildNode()->begin(); _iter != _XpathRoute->getChildNode()->end(); _iter++)
-	{
-		searchAll(&(*_iter),str);
+		if(_commandType == search_TagName)
+		{
+			if(!strcmp(_iter->getTagName(), str))
+			{
+				cout << _iter->getTagName() << "\t" << _iter->getContent() << endl;
+			}
+		}
+		searchAll(&(*_iter),str, _commandType);
 	}
 	return ;
 }
@@ -68,70 +78,16 @@ int main()
 		if(!strcmp(cmdBuf, "quit")) break;
 		else
 		{
-			searchAll(XpathRoute,cmdBuf);
-			/*
-			while(cmdBuf[cmdIdx] != '\0')
+			if(cmdBuf[cmdIdx] == '@')
 			{
-				if(cmdBuf[cmdIdx] == '/')
-				{
-					if(cmdBuf[cmdIdx+1] == '/')
-					{
-						while(cmdBuf[cmdIdx+2] != '\0' && cmdBuf[cmdIdx+2] != '/')
-						{
-							cout << cmdBuf[cmdIdx+2];
-							cmdIdx++;
-						}
-						cout << endl;
-						cmdIdx += 1;
-					}
-				}
-				else cout << cmdBuf[cmdIdx] << endl;
-				cmdIdx++;
-			}*/
-		}
-/*		else if(!strcmp(cmdBuf, "up")) XpathRoute = XpathRoute->getParentNode();
-		else if(!strcmp(cmdBuf, "down"))
-		{
-			cout << "child name : ";
-			cin >> cmdBuf;
-
-			bool searchComplete = false;
-			for(iter = XpathRoute->getChildNode()->begin(); iter != XpathRoute->getChildNode()->end(); iter++)
-			{
-				if(!strcmp(cmdBuf, iter->getTagName()))
-				{
-					searchComplete = true;
-					XpathRoute = &(*iter);
-					break;
-				}
+				searchAll(XpathRoute,&cmdBuf[cmdIdx+1], search_Attribute);
 			}
-			if(!searchComplete) cout << "fail" << endl;
-		}
-		else if(!strcmp(cmdBuf, "print"))
-		{
-			cout << "tagName : " << XpathRoute->getTagName() << endl;
-			cout << "content : " << XpathRoute->getContent() << endl;
-			cout << "childNodeSize : " << XpathRoute->getChildNode()->size() << endl;
-			if(XpathRoute->getChildNode()->size())
+			else if(cmdBuf[cmdIdx] == '/' && cmdBuf[cmdIdx+1] == '/')
 			{
-				cout << "ChildTagName : ";
-				for(iter = XpathRoute->getChildNode()->begin(); iter != XpathRoute->getChildNode()->end(); iter++)
-				{
-					cout << &(*iter->getTagName()) << " ";
-				}
-				cout << endl;
+				searchAll(XpathRoute,&cmdBuf[cmdIdx+2], search_TagName);
 			}
-			cout << "AttributeSize : " << XpathRoute->getAttribute()->size() << endl;
-			if(XpathRoute->getAttribute()->size())
-			{
-				for(iter2 = XpathRoute->getAttribute()->begin(); iter2 != XpathRoute->getAttribute()->end(); iter2++)
-				{
-					cout << "AttributeName : " << &(*iter2->getName()) << endl;
-					cout << "AttributeValue : " << &(*iter2->getValue()) << endl;
-				}
-			}
+			else cout << cmdBuf << endl;
 		}
-*/
 	}
 
 	delete[] fileName;
