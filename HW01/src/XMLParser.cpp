@@ -54,6 +54,7 @@ int XMLParser::checkChar(const char* str, const char _ch)
 	}
 
 	if(_ch == '>') return -1; // 태그 닫는 기호를 찾지 못했을때 에러 처리를 위함
+	if(_ch == '"') return -3; // 태그 닫는 기호를 찾지 못했을때 에러 처리를 위함
 
 	return _idx;
 }
@@ -135,6 +136,7 @@ void XMLParser::parserAttribute(int _blankNum)
 
 			_startIdx = _startIdx + _endIdx + 2;
 			_endIdx = checkChar(&tempBuf[_startIdx], '"');
+			if(_endIdx == -3) _endIdx = checkChar(&tempBuf[_startIdx], '\'');
 
 			strncpy(tempAttributeValue, &tempBuf[_startIdx], _endIdx);
 			tempAttributeValue[_endIdx] = '\0';
@@ -146,6 +148,9 @@ void XMLParser::parserAttribute(int _blankNum)
 
 			_blankNum = _startIdx + _endIdx + 1;
 		}
+
+		while(tempBuf[_blankNum] == ' ') _blankNum++; // 공백문자 제거
+
 		if(tempBuf[_blankNum] == '\0') break; //일반 태그
 		else if(tempBuf[_blankNum] == '/' && tempBuf[_blankNum+1] == '\0') break; //빈 태그 일 경우
 	}
@@ -167,7 +172,7 @@ int XMLParser::parser(const char* fileName, XMLNode* _XMLNode)
 		idx = 0;
 		while(buf[idx] != '\0')
 		{
-			while(buf[idx] == ' ') idx++; // 공백문자 제거
+			while(buf[idx] == ' ' || buf[idx] == '\t') idx++; // 공백문자 제거
 
 			if(buf[idx] == '<')
 			{

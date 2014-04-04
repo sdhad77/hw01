@@ -8,8 +8,8 @@
 #include <list>
 #include <string>
 
-#define MAX_CHAR_SIZE 100
-#define MAX_BUF_SIZE 500
+#define MAX_CHAR_SIZE 500
+#define MAX_BUF_SIZE 800
 
 #ifndef XMLNODE_H_
 #define XMLNODE_H_

@@ -1,12 +1,9 @@
 <?xml version="1.0"?>
 <?xml-stylesheet type="text/xsl" href="myfile.xsl" ?>
 <bookstore specialty="novel">
-  <book style="autobiography">
-    <author>
-      <first-name>Joe</first-name>
-      <last-name>Bob</last-name>
-      <award>Trenton Literary Review Honorable Mention</award>
-    </author>
-    <price>12</price>
-  </book>
+<configuration artifactName="${ProjName}" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.exe" buildProperties="org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.exe,org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.release" cleanCommand="rm -rf" description="" id="cdt.managedbuild.config.gnu.mingw.exe.release.1660397250" name="Release" parent="cdt.managedbuild.config.gnu.mingw.exe.release">
+
+  <folderInfo id="cdt.managedbuild.config.gnu.mingw.exe.release.1660397250." name="/" resourcePath="">
+  </folderInfo>
+ </configuration>
 </bookstore>

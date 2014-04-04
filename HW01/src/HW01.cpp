@@ -10,8 +10,8 @@
 #include "XMLParser.h"
 using namespace std;
 
-#define MAX_CHAR_SIZE 100
-#define MAX_BUF_SIZE 500
+#define MAX_CHAR_SIZE 500
+#define MAX_BUF_SIZE 800
 
 enum commandType { search_TagName, search_Attribute};
 
@@ -65,6 +65,7 @@ int main()
 		cout << "Á¾·á -> quit" << endl;
 		cout << "Input FileName : ";
 		cin >> fileName;
+
 		if(!strcmp(fileName, "quit")) return 0;
 		else if(!XParser.parser(fileName, XpathRoute)) break;
 	}
