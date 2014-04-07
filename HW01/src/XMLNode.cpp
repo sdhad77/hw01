@@ -2,7 +2,7 @@
  * XMLNode.cpp
  *
  *  Created on: 2014. 4. 2.
- *      Author: ½Åµ¿È¯
+ *      Author: ì‹ ë™í™˜
  */
 
 #include "XMLNode.h"
@@ -55,17 +55,18 @@ char* XMLNode::checkAmp(char* str)
 	int charEnd;
 
 	while(1)
-	{	//aaa&quot;bbb -> ¿¹½ÃÇüÅÂ
+	{	//aaa&quot;bbb -> ê¸°ë³¸ í˜•íƒœ
 		char* tempCheckAmp = new char[MAX_CHAR_SIZE];
 		char* tempCheckAmp2 = new char[MAX_CHAR_SIZE];
 		char* tempCheckAmp3 = new char[MAX_CHAR_SIZE];
 
-		ampEnd = checkChar(str, ';');	//;À§Ä¡ ¹İÈ¯
-		charEnd = checkChar(str, '\0');	//¹®ÀÚ¿­ÀÇ ³¡ ¹İÈ¯
+		ampEnd = checkChar(str, ';');	//;ê°€ ì¡´ì¬í•˜ëŠ”ì§€ ê²€ì‚¬
+		charEnd = checkChar(str, '\0');	//ë¬¸ìì—´ ëë‚˜ëŠ” ì§€ì  ê²€ì‚¬
 
-		strncpy(tempCheckAmp, &str[_idx+1], ampEnd -_idx - 1); //&quot; Áß¿¡¼­ quot º¹»ç
-		tempCheckAmp[ampEnd -_idx - 1] = '\0';	//quot µÚ¿¡ \0 ºÙÀÓ
+		strncpy(tempCheckAmp, &str[_idx+1], ampEnd -_idx - 1); //&quot; -> quot ë§Œ ë”°ë¡œ ì €ì¥
+		tempCheckAmp[ampEnd -_idx - 1] = '\0';	//quot ë’¤ì— \0 ë¶™ì—¬ì¤Œ
 
+		//ë¬¸ìì—´ì—ì„œ &ì™€ ;ì‚¬ì´ì— ìˆë˜ ë¬¸ìì—´ì´ ë¬´ì—‡ì¸ì§€ ê²€ì‚¬ í›„ ê¸°í˜¸ë¡œ ë³€ê²½
 		if(!strcmp(tempCheckAmp, "lt"))			tempCheckAmp = (char*)"<";
 		else if(!strcmp(tempCheckAmp, "gt"))	tempCheckAmp = (char*)">";
 		else if(!strcmp(tempCheckAmp, "amp"))	tempCheckAmp = (char*)"&";
@@ -73,22 +74,22 @@ char* XMLNode::checkAmp(char* str)
 		else if(!strcmp(tempCheckAmp, "quot"))	tempCheckAmp = (char*)"\"";
 		else
 		{
-			std::cout << "±âº» Á¦°ø Entity°¡ ¾Æ´Õ´Ï´Ù." << std::endl;
+			std::cout << "ì¡´ì¬í•˜ì§€ ì•ŠëŠ” Entityì…ë‹ˆë‹¤." << std::endl;
 			break;
 		}
-																		//aaa&quot;bbb -> ¿¹½ÃÇüÅÂ
-		strncpy(tempCheckAmp3, str, _idx); tempCheckAmp3[_idx] = '\0';	//aaa º¹»ç
-		strncpy(tempCheckAmp2, &str[ampEnd+1], charEnd-ampEnd);			//bbb º¹»ç
-		strcat(tempCheckAmp3, tempCheckAmp);							//aaa' °áÇÕ
-		strcat(tempCheckAmp3, tempCheckAmp2);							//aaa'bbb °áÇÕ
-		strcpy(str, tempCheckAmp3);										//aaa'bbb º¹»ç
+																		//aaa&quot;bbb -> ê¸°ë³¸í˜•íƒœ
+		strncpy(tempCheckAmp3, str, _idx); tempCheckAmp3[_idx] = '\0';	//aaaë§Œ ë¶„ë¦¬
+		strncpy(tempCheckAmp2, &str[ampEnd+1], charEnd-ampEnd);			//bbbë§Œ ë¶„ë¦¬
+		strcat(tempCheckAmp3, tempCheckAmp);							//aaa' -> quotì— í•´ë‹¹í•˜ëŠ” ê¸°í˜¸ë¥¼ aaa ë’¤ì— ë¶™ì„
+		strcat(tempCheckAmp3, tempCheckAmp2);							//aaa'bbb ìœ„ì˜ ë¬¸ìì—´ë“¤ì„ í•©ì¹¨
+		strcpy(str, tempCheckAmp3);										//aaa'bbb í•©ì³ì§„ ë¬¸ìì—´ì„ strë¡œ ì¹´í”¼
 
 		delete[] tempCheckAmp;
 		delete[] tempCheckAmp2;
 		delete[] tempCheckAmp3;
 
-		if(checkChar(&str[_idx+1], '&') == -2) break;	//& ¸øÃ£À¸¸é break
-		_idx = _idx + checkChar(&str[_idx+1], '&') + 1;	//&ÀÖÀ»°æ¿ì &À§Ä¡¸¦ idx¿¡ ÀúÀå
+		if(checkChar(&str[_idx+1], '&') == -2) break;	//ë‚¨ì€ ë¬¸ìì—´ì—ì„œ &ê°€ ìˆëŠ”ì§€ ê²€ì‚¬í•˜ê³ , ì—†ì„ê²½ìš° break; ê¸°í˜¸ë¡œ ìˆ˜ì •í•œ ì´í›„ì˜ ë¬¸ìì—´ì„ ê²€ì‚¬í•˜ê¸° ë•Œë¬¸ì— &amp->& ë³€í™˜ì— ëŒ€í•´ ì•ˆì „í•¨
+		_idx = _idx + checkChar(&str[_idx+1], '&') + 1;	//ìƒˆë¡œìš´ & ì‹œì‘ì ì„ ì°¾ì•„ì„œ _idxì— ì €ì¥
 	}
 
 	return str;

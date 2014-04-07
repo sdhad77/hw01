@@ -62,7 +62,7 @@ int main()
 
 	while(1)
 	{
-		cout << "Á¾·á -> quit" << endl;
+		cout << "ì¢…ë£Œ-> quit" << endl;
 		cout << "Input FileName : ";
 		cin >> fileName;
 

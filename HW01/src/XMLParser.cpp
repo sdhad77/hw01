@@ -2,7 +2,7 @@
  * XMLParser.cpp
  *
  *  Created on: 2014. 4. 2.
- *      Author: ½Åµ¿È¯
+ *      Author: ì‹ ë™í™˜
  */
 
 #include "XMLParser.h"
@@ -17,8 +17,8 @@ XMLParser::XMLParser() {
 	idx 		= 	0;
 	startIdx 	= 	0;
 	endIdx 		= 	0;
-	isRoute 	= 	true; //·çÆ® ³ëµåÀÎÁö
-	isEmptyTag 	= 	false;//ºóÅÂ±×ÀÎÁö
+	isRoute 	= 	true; //ë£¨íŠ¸ ë…¸ë“œì¸ì§€ ê²€ì‚¬í•˜ê¸° ìœ„í•¨
+	isEmptyTag 	= 	false;//ë¹ˆíƒœê·¸ì¸ì§€ ê²€ì‚¬í•˜ê¸° ìœ„í•¨
 
 	XpathRoute = new XMLNode;
 }
@@ -53,10 +53,25 @@ int XMLParser::checkChar(const char* str, const char _ch)
 		_idx++;
 	}
 
-	if(_ch == '>') return -1; // ÅÂ±× ´İ´Â ±âÈ£¸¦ Ã£Áö ¸øÇßÀ»¶§ ¿¡·¯ Ã³¸®¸¦ À§ÇÔ
-	if(_ch == '"') return -3; // ÅÂ±× ´İ´Â ±âÈ£¸¦ Ã£Áö ¸øÇßÀ»¶§ ¿¡·¯ Ã³¸®¸¦ À§ÇÔ
+	if(_ch == '>') return -1; // >íƒœê·¸ê°€ ë“±ì¥í•˜ì§€ ì•Šì•˜ì„ ê²½ìš°, ë‹¤ìŒ ë¼ì¸ì„ ì¶”ê°€ë¡œ ì½ì–´ì˜¤ê¸° ìœ„í•´ ì¡´ì¬í•¨.
+	if(_ch == '"') return -3; // "ê¸°í˜¸ê°€ ì•„ë‹Œ 'ê¸°í˜¸ë¡œ ì‹œì‘ë˜ëŠ” attribute valueë¥¼ ê²€ì‚¬í•˜ê¸° ìœ„í•¨.
 
 	return _idx;
+}
+
+bool XMLParser::checkByteOrderMark()
+{
+	//byte order mark**********************
+	if((    (unsigned char)buf[0] == 0xEF)	//0xEFBBBF -> UTF-8ì˜ byte order mark
+		&& ((unsigned char)buf[1] == 0xBB)	//BOMì´ ì¡´ì¬í•  ê²½ìš° ê·¸ëŒ€ë¡œ ì¶œë ¥ì‹œí‚¤ê³ 
+		&& ((unsigned char)buf[2] == 0xBF))	//ë‹¤ìŒ ë‹¨ì–´ë¡œ ë„˜ì–´ê°‘ë‹ˆë‹¤.
+	{
+		idx = 3;							//BOMì´í›„ë¡œ idxë¥¼ ì´ë™ì‹œí‚µë‹ˆë‹¤.
+		return true;
+	}
+
+	idx = 0;
+	return false;
 }
 
 void XMLParser::parserPI()
@@ -99,9 +114,9 @@ void XMLParser::parserStartTag()
 		XpathRoute = &XpathRoute->getChildNode()->back();
 		XpathRoute->setParentNode(currentNode);
 	}
-	parserAttribute(blankNum); // attribute Ã³¸®
+	parserAttribute(blankNum); // attribute ì²˜ë¦¬
 
-	if(isEmptyTag) XpathRoute = XpathRoute->getParentNode(); // ºóÅÂ±× Ã³¸®
+	if(isEmptyTag) XpathRoute = XpathRoute->getParentNode(); // ë¹ˆ íƒœê·¸ì¼ê²½ìš°, ë¶€ëª¨ ë…¸ë“œë¡œ ë°”ë¡œ ë³µê·€ì‹œí‚´
 }
 
 void XMLParser::parserEndTag()
@@ -122,7 +137,7 @@ void XMLParser::parserAttribute(int _blankNum)
 {
 	while(1)
 	{
-		while(tempBuf[_blankNum] == ' ') _blankNum++; // °ø¹é¹®ÀÚ Á¦°Å
+		while(tempBuf[_blankNum] == ' ') _blankNum++; // ê³µë°±ë¬¸ì ì œê±°
 
 		if(tempBuf[_blankNum] != '\0')
 		{
@@ -149,10 +164,10 @@ void XMLParser::parserAttribute(int _blankNum)
 			_blankNum = _startIdx + _endIdx + 1;
 		}
 
-		while(tempBuf[_blankNum] == ' ') _blankNum++; // °ø¹é¹®ÀÚ Á¦°Å
+		while(tempBuf[_blankNum] == ' ') _blankNum++; // ê³µë°±ë¬¸ì ì œê±°
 
-		if(tempBuf[_blankNum] == '\0') break; //ÀÏ¹İ ÅÂ±×
-		else if(tempBuf[_blankNum] == '/' && tempBuf[_blankNum+1] == '\0') break; //ºó ÅÂ±× ÀÏ °æ¿ì
+		if(tempBuf[_blankNum] == '\0') break; //
+		else if(tempBuf[_blankNum] == '/' && tempBuf[_blankNum+1] == '\0') break; //ë¹ˆ íƒœê·¸ì¼ ê²½ìš° ë©ˆì¶”ê¸° ìœ„í•¨.
 	}
 }
 
@@ -163,16 +178,20 @@ int XMLParser::parser(const char* fileName, XMLNode* _XMLNode)
 	ifstream fin(fileName);
 	if(!fin)
 	{
-		cout << "Á¸ÀçÇÏÁö ¾Ê´Â ÆÄÀÏÀÔ´Ï´Ù." << endl;
+		cout << "íŒŒì¼ì´ ì¡´ì¬í•˜ì§€ ì•ŠìŠµë‹ˆë‹¤." << endl;
 		return 1;
 	}
 
+	//byte order mark ê²€ì‚¬==================
+	fin.getline(buf, MAX_BUF_SIZE);
+	if(checkByteOrderMark())fin.seekg(0);
+	//====================================
+
 	while(fin.getline(buf, MAX_BUF_SIZE))
 	{
-		idx = 0;
 		while(buf[idx] != '\0')
 		{
-			while(buf[idx] == ' ' || buf[idx] == '\t') idx++; // °ø¹é¹®ÀÚ Á¦°Å
+			while(buf[idx] == ' ' || buf[idx] == '\t') idx++; // ê³µë°±ì´ë‚˜ íƒ­ë¬¸ìê°€ ë‚˜íƒ€ë‚˜ë©´ idx ì¦ê°€.
 
 			if(buf[idx] == '<')
 			{
@@ -187,21 +206,23 @@ int XMLParser::parser(const char* fileName, XMLNode* _XMLNode)
 				}
 				strncpy(tempBuf, &buf[startIdx], endIdx);
 				tempBuf[endIdx] = '\0';
-				idx = endIdx + startIdx + 1; //ÇöÀç ÅÂ±×ÀÇ ³¡+1·Î ÀÎµ¦½º ÀÌµ¿½ÃÅ´
+				idx = endIdx + startIdx + 1; //ë‹¤ìŒ ë¬¸ìì—´ë¡œ idxë¥¼ ì´ë™ì‹œí‚´
 
 				if		(tempBuf[0] == '?')	parserPI();
-				else if	(tempBuf[0] == '!') parserDTD(); // commentµµ °°ÀÌ Ã³¸®ÇÔ
+				else if	(tempBuf[0] == '!') parserDTD(); // ì£¼ì„ì€ parserDTD í•¨ìˆ˜ ë‚´ì—ì„œ ì²˜ë¦¬
 				else if	(tempBuf[0] == '/')	parserEndTag();
 				else						parserStartTag();
 			}
 			else if(checkAlpha(buf[idx]) || checkNumber(buf[idx])) parserContent();
 			else
 			{
-				cout << "Á¤»óÀûÀÌÁö ¾ÊÀº ¹®ÀÚ¿­ÀÌ ÀÔ·ÂµÇ¾ú½À´Ï´Ù." << endl;
+				cout << "ì˜¬ë°”ë¥´ì§€ ì•Šì€ ë¬¸ìê°€ ì…ë ¥ë˜ì—ˆìŠµë‹ˆë‹¤." << endl;
 				cout << buf << endl;
 				return 2;
 			}
 		}
+
+		idx = 0;
 	}
 
 	fin.close();

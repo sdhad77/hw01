@@ -3,7 +3,7 @@
 
  *
  *  Created on: 2014. 4. 2.
- *      Author: ½Åµ¿È¯
+ *      Author: ì‹ ë™í™˜
  */
 #include <iostream>
 #include <fstream>
@@ -24,6 +24,7 @@ public:
 	bool checkAlpha(const char ch);
 	bool checkNumber(const char ch);
 	int checkChar(const char* str, const char _ch);
+	bool checkByteOrderMark();
 	int parser(const char* fileName, XMLNode* _XMLNode);
 	void parserPI();
 	void parserDTD();
@@ -37,8 +38,8 @@ private:
 	char* tempElement;
 	char* tempAttributeName;
 	char* tempAttributeValue;
-	char* buf;			//input¹®¼­¸¦ ÇÑ ÁÙ ´ÜÀ§·Î ÀúÀåÇÏ´Â ¹öÆÛ
-	char* tempBuf;		//buf¿¡¼­ ÅÂ±× ´ÜÀ§·Î ÀúÀåÇÏ´Â ¹öÆÛ
+	char* buf;			//input íŒŒì¼ì„ í•œì¤„ì”© ì½ì–´ì˜¤ê¸° ìœ„í•œ ë²„í¼
+	char* tempBuf;		//bufì— ì €ì¥ëœ ë¬¸ìë“¤ì„ íƒœê·¸ë¥¼ ê¸°ì¤€ìœ¼ë¡œ ìë¥´ê¸° ìœ„í•œ ë²„í¼
 
 	int idx;
 	int startIdx;

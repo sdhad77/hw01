@@ -2,7 +2,7 @@
  * XMLNode.h
  *
  *  Created on: 2014. 4. 2.
- *      Author: �ŵ�ȯ
+ *      Author: 신동환
  */
 #include <iostream>
 #include <list>
