@@ -48,7 +48,9 @@ int main()
 			}
 			else if(cmdBuf[cmdIdx] == '/' && cmdBuf[cmdIdx+1] == '/')
 			{
+				Xpath.ClearNodeList();
 				Xpath.Search_All(XpathRoute,&cmdBuf[cmdIdx+2], search_TagName);
+				Xpath.PrintNodeList();
 			}
 			else cout << cmdBuf << endl;
 		}

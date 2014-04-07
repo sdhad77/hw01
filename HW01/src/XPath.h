@@ -23,7 +23,7 @@ private:
 	std::list<XMLNode*> nodeList;
 
 public:
-	int XPathCmdParser();				//cmd분석 함수.
+	int XPathCmdParser(char* _cmdBuf, XMLNode* _XpathRoute);//cmd분석 함수.
 	void Search_All(XMLNode* _XpathRoute, const char* str, commandType _commandType);//가장 기본적인 탐색함수. 전체 순회 방식
 	void AddNodeList(XMLNode* node);	//노드를 노드 리스트에 추가하는 함수.
 	void ClearNodeList();				//현재 위치와 상관없는 탐색의 경우, 탐색 시작전에 노드를 비우도록 함.
