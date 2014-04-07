@@ -24,8 +24,7 @@ void XPath::Search_All(XMLNode* _XpathRoute, const char* str, commandType _comma
 
 	if(_commandType == search_TagName)
 	{
-		if(!strcmp(_XpathRoute->getTagName(), str))
-			std::cout << _XpathRoute->getTagName() << "\t" << _XpathRoute->getContent() << std::endl;
+		if(!strcmp(_XpathRoute->getTagName(), str)) _XpathRoute->PrintNode();
 	}
 
 	else if(_commandType == search_Attribute)
@@ -49,10 +48,6 @@ void XPath::AddNodeList(XMLNode* node)
 void XPath::ClearNodeList()
 {
 	nodeList.clear();
-}
-
-void XPath::PrintNode()
-{
 }
 
 void XPath::PrintNodeList()

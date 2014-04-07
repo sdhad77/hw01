@@ -70,6 +70,10 @@ public:
 	void setChildNode(const XMLNode* _childNode);
 	std::list<tagAttribute>* getAttribute();
 	void setAttribute(const tagAttribute* _attribute);
+	void PrintContent();
+	void PrintTagName();
+	void PrintAttribute();
+	void PrintNode();//특정 노드만 출력 시킬때 사용.
 };
 
 #endif /* XMLNODE_H_ */
