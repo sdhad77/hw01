@@ -20,33 +20,21 @@ void searchAll(XMLNode* _XpathRoute, const char* str, commandType _commandType)
 	list<XMLNode>::iterator _iter;
 	list<tagAttribute>::iterator _iter2;
 
-	if(_commandType == search_Attribute)
+	if(_commandType == search_TagName)
+	{
+		if(!strcmp(_XpathRoute->getTagName(), str)) 	cout << _XpathRoute->getTagName() << "\t" << _XpathRoute->getContent() << endl;
+	}
+
+	else if(_commandType == search_Attribute)
 	{
 		for(_iter2 = _XpathRoute->getAttribute()->begin(); _iter2 != _XpathRoute->getAttribute()->end(); _iter2++)
 		{
-			if(!strcmp(_iter2->getName(), str))
-			{
-				cout << _iter2->getName() << "\t" << _iter2->getValue() << endl;
-			}
-			else if(!strcmp(_iter2->getValue(), str))
-			{
-				cout << _iter2->getName() << "\t" << _iter2->getValue() << endl;
-			}
+			if(!strcmp(_iter2->getName(), str))			cout << _iter2->getName() << "\t" << _iter2->getValue() << endl;
+			else if(!strcmp(_iter2->getValue(), str))	cout << _iter2->getName() << "\t" << _iter2->getValue() << endl;
 		}
 	}
 
-	for(_iter = _XpathRoute->getChildNode()->begin(); _iter != _XpathRoute->getChildNode()->end(); _iter++)
-	{
-		if(_commandType == search_TagName)
-		{
-			if(!strcmp(_iter->getTagName(), str))
-			{
-				cout << _iter->getTagName() << "\t" << _iter->getContent() << endl;
-			}
-		}
-		searchAll(&(*_iter),str, _commandType);
-	}
-	return ;
+	for(_iter = _XpathRoute->getChildNode()->begin(); _iter != _XpathRoute->getChildNode()->end(); _iter++) searchAll(&(*_iter),str, _commandType);
 }
 
 int main()

@@ -216,9 +216,9 @@ int XMLParser::parser(const char* fileName, XMLNode* _XMLNode)
 			else if(checkAlpha(buf[idx]) || checkNumber(buf[idx])) parserContent();
 			else
 			{
-				cout << "올바르지 않은 문자가 입력되었습니다." << endl;
+				parserContent();
+				cout << "알파벳과 숫자 이외의 문자가 입력되었습니다." << endl;
 				cout << buf << endl;
-				return 2;
 			}
 		}
 

@@ -1,5 +1,0 @@
-<?xml version="1.0"?>
-<?xml-stylesheet type="text/xsl" href="myfile.xsl" ?>
-<book>
-  <myElement question="They asked &quot;Why?&quot;" />
-</book>
