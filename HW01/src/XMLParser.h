@@ -21,19 +21,6 @@ public:
 	XMLParser();
 	virtual ~XMLParser();
 
-	bool checkAlpha(const char ch);
-	bool checkNumber(const char ch);
-	int checkChar(const char* str, const char _ch);
-	bool checkByteOrderMark();
-	int parser(const char* fileName, XMLNode* _XMLNode);
-	void parserPI();
-	void parserDTD();
-	void parserComment();
-	void parserStartTag();
-	void parserEndTag();
-	void parserContent();
-	void parserAttribute(int _blankNum);
-
 private:
 	char* tempElement;
 	char* tempAttributeName;
@@ -47,7 +34,20 @@ private:
 	bool isRoute;
 	bool isEmptyTag;
 
+public:
 	XMLNode* XpathRoute;
+	bool checkAlpha(const char ch);
+	bool checkNumber(const char ch);
+	int checkChar(const char* str, const char _ch);
+	bool checkByteOrderMark();
+	int parser(const char* fileName, XMLNode* _XMLNode);
+	void parserPI();
+	void parserDTD();
+	void parserComment();
+	void parserStartTag();
+	void parserEndTag();
+	void parserContent();
+	void parserAttribute(int _blankNum);
 };
 
 #endif /* XMLPARSER_H_ */
