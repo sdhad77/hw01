@@ -8,34 +8,11 @@
 #include <iostream>
 #include "XMLNode.h"
 #include "XMLParser.h"
+#include "XPath.h"
 using namespace std;
 
 #define MAX_CHAR_SIZE 500
 #define MAX_BUF_SIZE 800
-
-enum commandType { search_TagName, search_Attribute};
-
-void searchAll(XMLNode* _XpathRoute, const char* str, commandType _commandType)
-{
-	list<XMLNode>::iterator _iter;
-	list<tagAttribute>::iterator _iter2;
-
-	if(_commandType == search_TagName)
-	{
-		if(!strcmp(_XpathRoute->getTagName(), str)) 	cout << _XpathRoute->getTagName() << "\t" << _XpathRoute->getContent() << endl;
-	}
-
-	else if(_commandType == search_Attribute)
-	{
-		for(_iter2 = _XpathRoute->getAttribute()->begin(); _iter2 != _XpathRoute->getAttribute()->end(); _iter2++)
-		{
-			if(!strcmp(_iter2->getName(), str))			cout << _iter2->getName() << "\t" << _iter2->getValue() << endl;
-			else if(!strcmp(_iter2->getValue(), str))	cout << _iter2->getName() << "\t" << _iter2->getValue() << endl;
-		}
-	}
-
-	for(_iter = _XpathRoute->getChildNode()->begin(); _iter != _XpathRoute->getChildNode()->end(); _iter++) searchAll(&(*_iter),str, _commandType);
-}
 
 int main()
 {
@@ -43,15 +20,13 @@ int main()
 	char* cmdBuf 	= 	new char[MAX_CHAR_SIZE];
 	int cmdIdx		=	0;
 
+	XPath Xpath;
 	XMLParser XParser;
 	XMLNode* XpathRoute = new XMLNode;
-	list<XMLNode>::iterator iter;
-	list<tagAttribute>::iterator iter2;
 
 	while(1)
 	{
-		cout << "종료-> quit" << endl;
-		cout << "Input FileName : ";
+		cout << "Input FileName(quit) : ";
 		cin >> fileName;
 
 		if(!strcmp(fileName, "quit")) return 0;
@@ -69,11 +44,11 @@ int main()
 		{
 			if(cmdBuf[cmdIdx] == '@')
 			{
-				searchAll(XpathRoute,&cmdBuf[cmdIdx+1], search_Attribute);
+				Xpath.Search_All(XpathRoute,&cmdBuf[cmdIdx+1], search_Attribute);
 			}
 			else if(cmdBuf[cmdIdx] == '/' && cmdBuf[cmdIdx+1] == '/')
 			{
-				searchAll(XpathRoute,&cmdBuf[cmdIdx+2], search_TagName);
+				Xpath.Search_All(XpathRoute,&cmdBuf[cmdIdx+2], search_TagName);
 			}
 			else cout << cmdBuf << endl;
 		}
@@ -82,12 +57,6 @@ int main()
 	delete[] fileName;
 	delete[] cmdBuf;
 	delete XpathRoute;
-
-	/*
-	cout << "press any key.." << endl;
-	cin.ignore();
-	cin.get();
-	*/
 
 	return 0;
 }
