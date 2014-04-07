@@ -10,11 +10,11 @@
 #include "XMLNode.h"
 using namespace std;
 
-#define MAX_CHAR_SIZE 500
-#define MAX_BUF_SIZE 800
-
 #ifndef XMLPARSER_H_
 #define XMLPARSER_H_
+
+#define MAX_CHAR_SIZE 500
+#define MAX_BUF_SIZE 800
 
 class XMLParser {
 public:

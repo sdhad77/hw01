@@ -156,12 +156,12 @@ void XMLNode::setAttribute(const tagAttribute* _attribute)
 
 void XMLNode::PrintContent()
 {
-	std::cout << getContent();
+	std::cout << getContent() << std::endl;
 }
 
 void XMLNode::PrintTagName()
 {
-	std::cout << getTagName();
+	std::cout << getTagName() << std::endl;
 }
 
 void XMLNode::PrintAttribute()
@@ -173,16 +173,10 @@ void XMLNode::PrintAttribute()
 	}
 }
 
-void XMLNode::PrintNode()
+void XMLNode::PrintNode(printType _type)
 {
-	std:: cout << "<" << getTagName() << "> " << getContent();
-	if((attribute.size() > 0) || (getChildNode()->size() > 0)) std::cout << std::endl;
-	else std::cout << " ";
-
-	PrintAttribute();
-
-	std::list<XMLNode>::iterator _iter;
-	for(_iter = getChildNode()->begin(); _iter != getChildNode()->end(); _iter++) _iter->PrintNode();
-
-	std:: cout << "</" << getTagName() << "> " << std::endl;
+	if(_type == print_TagName) 		PrintTagName();
+	else if(_type == print_Content)	PrintContent();
+	else if(_type == print_AtrName)	PrintAttribute();
+	else if(_type == print_AtrValue)PrintAttribute();
 }

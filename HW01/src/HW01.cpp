@@ -18,7 +18,6 @@ int main()
 {
 	char* fileName	= 	new char[MAX_CHAR_SIZE];
 	char* cmdBuf 	= 	new char[MAX_CHAR_SIZE];
-	int cmdIdx		=	0;
 
 	XPath Xpath;
 	XMLParser XParser;
@@ -29,31 +28,24 @@ int main()
 		cout << "Input FileName(quit) : ";
 		cin >> fileName;
 
-		if(!strcmp(fileName, "quit")) return 0;
+		if(!strcmp(fileName, "quit"))
+		{
+			delete[] fileName;
+			delete[] cmdBuf;
+			delete XpathRoute;
+
+			return 0;
+		}
 		else if(!XParser.parser(fileName, XpathRoute)) break;
 	}
 
 	while(1)
 	{
-		cmdIdx = 0;
 		cout << "cmd : ";
 		cin >> cmdBuf;
 
 		if(!strcmp(cmdBuf, "quit")) break;
-		else
-		{
-			if(cmdBuf[cmdIdx] == '@')
-			{
-				Xpath.Search_All(XpathRoute,&cmdBuf[cmdIdx+1], search_Attribute);
-			}
-			else if(cmdBuf[cmdIdx] == '/' && cmdBuf[cmdIdx+1] == '/')
-			{
-				Xpath.ClearNodeList();
-				Xpath.Search_All(XpathRoute,&cmdBuf[cmdIdx+2], search_TagName);
-				Xpath.PrintNodeList();
-			}
-			else cout << cmdBuf << endl;
-		}
+		else Xpath.XPathCmdParser(cmdBuf, XpathRoute);
 	}
 
 	delete[] fileName;

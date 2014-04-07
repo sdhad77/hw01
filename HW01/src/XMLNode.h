@@ -8,11 +8,13 @@
 #include <list>
 #include <string>
 
+#ifndef XMLNODE_H_
+#define XMLNODE_H_
+
 #define MAX_CHAR_SIZE 500
 #define MAX_BUF_SIZE 800
 
-#ifndef XMLNODE_H_
-#define XMLNODE_H_
+enum printType { print_TagName, print_Content, print_AtrName, print_AtrValue};
 
 struct tagAttribute
 {
@@ -42,6 +44,8 @@ public:
 	void setName(const char* _name) {strcpy(name, _name);}
 	char* getValue() {return value;}
 	void setValue(const char* _value) {strcpy(value, _value);}
+	void PrintName() {std::cout << name << std::endl;}
+	void PrintValue() {std::cout << value << std::endl;}
 };
 
 class XMLNode {
@@ -60,6 +64,7 @@ private:
 public:
 	int checkChar(const char* str, const char _ch);
 	char* checkAmp(char* str);
+
 	char* getTagName();
 	void setTagName(const char* _tagName);
 	char* getContent();
@@ -70,10 +75,11 @@ public:
 	void setChildNode(const XMLNode* _childNode);
 	std::list<tagAttribute>* getAttribute();
 	void setAttribute(const tagAttribute* _attribute);
+
 	void PrintContent();
 	void PrintTagName();
 	void PrintAttribute();
-	void PrintNode();//특정 노드만 출력 시킬때 사용.
+	void PrintNode(printType _type);
 };
 
 #endif /* XMLNODE_H_ */

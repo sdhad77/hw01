@@ -16,7 +16,20 @@ XPath::~XPath() {
 int XPath::XPathCmdParser(char* _cmdBuf, XMLNode* _XpathRoute)
 {
 	int _cmdIdx = 0;
-	if(_cmdBuf[_cmdIdx] == '@') std::cout << "@입력" << std::endl;
+
+	if(_cmdBuf[_cmdIdx] == '/' && _cmdBuf[_cmdIdx+1] == '/')
+	{
+		ClearNodeList();
+		Search_All(_XpathRoute,&_cmdBuf[_cmdIdx+2], search_TagName);
+		PrintNodeList(print_Content);
+	}
+	else if(_cmdBuf[_cmdIdx] == '@')
+	{
+		Search_All(_XpathRoute,&_cmdBuf[_cmdIdx+1], search_Attribute);
+	}
+	else std::cout << _cmdBuf << std::endl;
+
+	return 0;
 }
 
 void XPath::Search_All(XMLNode* _XpathRoute, const char* str, commandType _commandType)
@@ -52,11 +65,11 @@ void XPath::ClearNodeList()
 	nodeList.clear();
 }
 
-void XPath::PrintNodeList()
+void XPath::PrintNodeList(printType _type)
 {
 	std::list<XMLNode *>::iterator _iter;
 	for(_iter = nodeList.begin(); _iter != nodeList.end(); _iter++)
 	{
-		(*_iter)->PrintNode();
+		(*_iter)->PrintNode(_type);
 	}
 }
