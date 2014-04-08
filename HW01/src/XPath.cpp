@@ -57,6 +57,20 @@ int XPath::XPathCmdParser(char* _cmdBuf, XMLNode* _XpathRoute)
 				{
 					1;
 				}
+				else if(checkAlpha(_cmdBuf[_cmdIdx+2]))
+				{
+					_cmdIdx = _cmdIdx + 2;
+					_startIdx = _cmdIdx;
+					while(checkAlpha(_cmdBuf[_cmdIdx])) _cmdIdx++;
+					strncpy(_strBuf, &_cmdBuf[_startIdx], _cmdIdx-_startIdx);
+					_strBuf[_cmdIdx-_startIdx] = '\0';
+
+					while(_cmdBuf[_cmdIdx] == ' ') _cmdIdx++; //공백제거
+
+					searchNodeQ.pop();
+					Search_All(_XpathRoute, _strBuf, search_TagName);
+					printType = print_Content;
+				}
 				else
 				{
 					1;
@@ -154,7 +168,7 @@ void XPath::Search_All(XMLNode* _XpathRoute, const char* str, CommandType _comma
 
 	if(_commandType == search_TagName)
 	{
-		if(!strcmp(_XpathRoute->getTagName(), str)) AddNodeList(_XpathRoute);
+		if(!strcmp(_XpathRoute->getTagName(), str)) searchNodeQ.push(_XpathRoute);
 	}
 
 	else if(_commandType == search_Attribute)
@@ -170,6 +184,7 @@ void XPath::Search_All(XMLNode* _XpathRoute, const char* str, CommandType _comma
 		Search_All(&(*_iter),str, _commandType);
 }
 
+//searchNodeQ 를 이용한 탐색
 void XPath::Search_Child(const char* str)
 {
 	std::list<XMLNode>::iterator _iter;
