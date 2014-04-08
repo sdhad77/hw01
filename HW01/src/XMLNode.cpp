@@ -167,15 +167,6 @@ void XMLNode::PrintName()
 	std::cout << getName() << std::endl;
 }
 
-void XMLNode::PrintAttribute()
-{
-	std::list<XMLNode>::iterator _iter2;
-	for(_iter2 = attribute.begin(); _iter2 != attribute.end(); _iter2++)
-	{
-		std::cout << _iter2->getName() << " : " << _iter2->getValue() << std::endl;
-	}
-}
-
 void XMLNode::PrintNode(PrintType _type)
 {
 	if(_type == print_Name) 		PrintName();

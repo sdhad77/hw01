@@ -9,6 +9,7 @@
 
 XPath::XPath() {
 	printType = print_Value;
+	firstCallSearch_All = true;
 }
 
 XPath::~XPath() {
@@ -36,6 +37,7 @@ int XPath::XPathCmdParser(char* _cmdBuf, XMLNode* _XpathRoute)
 	while(searchNodeQ.size()) searchNodeQ.pop();
 
 	XMLNode* tempNode = new XMLNode;
+	tempNode->setName("Root's Parent");
 	tempNode->setChildNode(_XpathRoute);
 	searchNodeQ.push(tempNode);
 
@@ -49,7 +51,7 @@ int XPath::XPathCmdParser(char* _cmdBuf, XMLNode* _XpathRoute)
 			{
 				if(_cmdBuf[_cmdIdx+2] == '*')
 				{
-					Search_All(_XpathRoute);
+					Search_All_NonString(_XpathRoute);
 					_cmdIdx = _cmdIdx + 3;
 					printType = print_Name;
 				}
@@ -75,6 +77,7 @@ int XPath::XPathCmdParser(char* _cmdBuf, XMLNode* _XpathRoute)
 					else
 					{
 						std::cout << "잘못입력하였습니다." << std::endl;
+						_cmdBuf[_cmdIdx] = '\0';
 					}
 				}
 				else if(checkAlpha(_cmdBuf[_cmdIdx+2]))
@@ -96,12 +99,20 @@ int XPath::XPathCmdParser(char* _cmdBuf, XMLNode* _XpathRoute)
 				}
 				else
 				{
-					1;
+					std::cout << "// 이후 알파벳,*,@ 이외의 문자가 입력되었습니다." << std::endl;
+					_cmdBuf[_cmdIdx] = '\0';
 				}
 			}
 			else if(_cmdBuf[_cmdIdx+1] == '*')
 			{
-				1;
+				int tempQSize = searchNodeQ.size();
+				while(tempQSize--)
+				{
+					Search_All_NonString(searchNodeQ.front());
+					searchNodeQ.pop();
+				}
+				_cmdIdx = _cmdIdx + 2;
+				printType = print_Name;
 			}
 			else if(checkAlpha(_cmdBuf[_cmdIdx+1]))
 			{
@@ -175,9 +186,17 @@ int XPath::XPathCmdParser(char* _cmdBuf, XMLNode* _XpathRoute)
 	return 0;
 }
 
+void XPath::Search_All_NonString(XMLNode* _XpathRoute)
+{
+	firstCallSearch_All = true;
+
+	Search_All(_XpathRoute);
+}
+
 void XPath::Search_All(XMLNode* _XpathRoute)
 {
-	searchNodeQ.push(_XpathRoute);
+	if(!firstCallSearch_All) searchNodeQ.push(_XpathRoute);
+	else firstCallSearch_All = false;
 
 	std::list<XMLNode>::iterator _iter;
 	for(_iter = _XpathRoute->getChildNode()->begin(); _iter != _XpathRoute->getChildNode()->end(); _iter++)

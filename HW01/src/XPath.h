@@ -29,11 +29,14 @@ private:
 	std::queue<XMLNode*> searchNodeQ;
 	PrintType printType;
 
+	bool firstCallSearch_All;
+
 public:
 	bool checkAlpha(const char ch);
 	bool checkNumber(const char ch);
 
 	int XPathCmdParser(char* _cmdBuf, XMLNode* _XpathRoute);//cmd분석 함수.
+	void Search_All_NonString(XMLNode* _XpathRoute);
 	void Search_All(XMLNode* _XpathRoute);
 	void Search_All(XMLNode* _XpathRoute, const char* str, CommandType _commandType);//가장 기본적인 탐색함수. 전체 순회 방식
 	void Search_Child(const char* str);

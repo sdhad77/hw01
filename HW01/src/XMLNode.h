@@ -46,7 +46,6 @@ public:
 
 	void PrintValue();
 	void PrintName();
-	void PrintAttribute();
 	void PrintNode(PrintType _type);
 };
 

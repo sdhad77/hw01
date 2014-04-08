@@ -160,6 +160,7 @@ void XMLParser::parserAttribute(int _blankNum)
 			XpathRoute->checkAmp(tempAttribute.getName());
 			XpathRoute->checkAmp(tempAttribute.getValue());
 			XpathRoute->setAttribute(&tempAttribute);
+			XpathRoute->getAttribute()->back().setParentNode(XpathRoute);
 
 			_blankNum = _startIdx + _endIdx + 1;
 		}
