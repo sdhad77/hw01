@@ -10,7 +10,7 @@
 XMLNode::XMLNode() {
 	tagName = new char[MAX_CHAR_SIZE];
 	content = new char[MAX_CHAR_SIZE];
-	parentNode = 0;
+	parentNode = NULL;
 	tagName[0] = '\0';
 	content[0] = '\0';
 }
@@ -25,6 +25,8 @@ XMLNode::XMLNode(const XMLNode& node)
 	strcpy(tagName, node.tagName);
 	strcpy(content, node.content);
 	parentNode = node.parentNode;
+	childNode = node.childNode;
+	attribute = node.attribute;
 }
 
 XMLNode::~XMLNode() {
@@ -75,6 +77,7 @@ char* XMLNode::checkAmp(char* str)
 		else
 		{
 			std::cout << "존재하지 않는 Entity입니다." << std::endl;
+			std::cout << str << std::endl;
 			break;
 		}
 																		//aaa&quot;bbb -> 기본형태
@@ -173,7 +176,7 @@ void XMLNode::PrintAttribute()
 	}
 }
 
-void XMLNode::PrintNode(printType _type)
+void XMLNode::PrintNode(PrintType _type)
 {
 	if(_type == print_TagName) 		PrintTagName();
 	else if(_type == print_Content)	PrintContent();

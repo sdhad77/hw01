@@ -8,31 +8,146 @@
 #include "XPath.h"
 
 XPath::XPath() {
+	printType = print_Content;
 }
 
 XPath::~XPath() {
 }
 
+bool XPath::checkAlpha(const char ch)
+{
+	if ('a' <= ch && ch <= 'z') return true;
+	else if ('A' <= ch && ch <= 'Z') return true;
+	else return false;
+}
+
+bool XPath::checkNumber(const char ch)
+{
+	if ('0' <= ch && ch <= '9') return true;
+	else return false;
+}
+
 int XPath::XPathCmdParser(char* _cmdBuf, XMLNode* _XpathRoute)
 {
 	int _cmdIdx = 0;
+	int _startIdx = 0;
+	char* _strBuf = new char[MAX_CHAR_SIZE];
 
-	if(_cmdBuf[_cmdIdx] == '/' && _cmdBuf[_cmdIdx+1] == '/')
+	while(searchNodeQ.size()) searchNodeQ.pop();
+
+	XMLNode* tempNode = new XMLNode;
+	tempNode->setChildNode(_XpathRoute);
+	searchNodeQ.push(tempNode);
+
+	while(_cmdBuf[_cmdIdx] != '\0')
 	{
-		ClearNodeList();
-		Search_All(_XpathRoute,&_cmdBuf[_cmdIdx+2], search_TagName);
-		PrintNodeList(print_Content);
+		while(_cmdBuf[_cmdIdx] == ' ') _cmdIdx++; //공백제거
+
+		if(_cmdBuf[_cmdIdx] == '/')
+		{
+			if(_cmdBuf[_cmdIdx+1] == '/')
+			{
+				if(_cmdBuf[_cmdIdx+2] == '*')
+				{
+					Search_All(_XpathRoute);
+					_cmdIdx = _cmdIdx + 3;
+					printType = print_TagName;
+				}
+				else if(_cmdBuf[_cmdIdx+2] == '@')
+				{
+					1;
+				}
+				else
+				{
+					1;
+				}
+			}
+			else if(_cmdBuf[_cmdIdx+1] == '*')
+			{
+				1;
+			}
+			else if(checkAlpha(_cmdBuf[_cmdIdx+1]))
+			{
+				_startIdx = ++_cmdIdx;
+				while(checkAlpha(_cmdBuf[_cmdIdx])) _cmdIdx++;
+				strncpy(_strBuf, &_cmdBuf[_startIdx], _cmdIdx-_startIdx);
+				_strBuf[_cmdIdx-_startIdx] = '\0';
+
+				Search_Child(_strBuf);
+				printType = print_Content;
+			}
+			else
+			{
+				std::cout << "/ 이후 처리되지 않은 문자가 나타났습니다." << std::endl;
+			}
+		}
+		else if(_cmdBuf[_cmdIdx] == '[')
+		{
+			if(checkNumber(_cmdBuf[_cmdIdx+1]))
+			{
+				_startIdx = ++_cmdIdx;
+				while(checkNumber(_cmdBuf[_cmdIdx])) _cmdIdx++;
+				strncpy(_strBuf, &_cmdBuf[_startIdx], _cmdIdx-_startIdx);
+				_strBuf[_cmdIdx-_startIdx] = '\0';
+
+				while(_cmdBuf[_cmdIdx] == ' ') _cmdIdx++; //공백제거
+
+				if(_cmdBuf[_cmdIdx] == ']')
+				{
+					_cmdIdx++;
+					int selectCnt = atoi(_strBuf);
+					if((int)searchNodeQ.size() >= selectCnt)
+					{
+						while(--selectCnt) searchNodeQ.pop();
+						searchNodeQ.push(searchNodeQ.front());
+						while(searchNodeQ.size()-1) searchNodeQ.pop();
+						printType = print_Content;
+					}
+					else
+					{
+						std::cout << "입력된 숫자가 너무 큽니다." << std::endl;
+						while(searchNodeQ.size()) searchNodeQ.pop();
+					}
+				}
+				else
+				{
+					std::cout << "[로 시작하면 ]로 끝나야 합니다." << std::endl;
+					while(searchNodeQ.size()) searchNodeQ.pop();
+				}
+			}
+			else if(checkAlpha(_cmdBuf[_cmdIdx+1]))
+			{
+				while(_cmdBuf[_cmdIdx] != '\0') _cmdIdx++;
+			}
+			else
+			{
+				while(_cmdBuf[_cmdIdx] != '\0') _cmdIdx++;
+			}
+		}
+		else
+		{
+			while(_cmdBuf[_cmdIdx] != '\0') _cmdIdx++;
+		}
 	}
-	else if(_cmdBuf[_cmdIdx] == '@')
-	{
-		Search_All(_XpathRoute,&_cmdBuf[_cmdIdx+1], search_Attribute);
-	}
-	else std::cout << _cmdBuf << std::endl;
+
+	PrintNodeQ();
+
+	delete[] _strBuf;
+	delete tempNode;
 
 	return 0;
 }
 
-void XPath::Search_All(XMLNode* _XpathRoute, const char* str, commandType _commandType)
+void XPath::Search_All(XMLNode* _XpathRoute)
+{
+	searchNodeQ.push(_XpathRoute);
+
+	std::list<XMLNode>::iterator _iter;
+	for(_iter = _XpathRoute->getChildNode()->begin(); _iter != _XpathRoute->getChildNode()->end(); _iter++)
+			Search_All(&(*_iter));
+}
+
+void XPath::Search_All(XMLNode* _XpathRoute, const char* str, CommandType _commandType)
 {
 	std::list<XMLNode>::iterator _iter;
 	std::list<tagAttribute>::iterator _iter2;
@@ -55,6 +170,21 @@ void XPath::Search_All(XMLNode* _XpathRoute, const char* str, commandType _comma
 		Search_All(&(*_iter),str, _commandType);
 }
 
+void XPath::Search_Child(const char* str)
+{
+	std::list<XMLNode>::iterator _iter;
+	int tempCnt = searchNodeQ.size();
+
+	while(tempCnt--)
+	{
+		for(_iter = searchNodeQ.front()->getChildNode()->begin(); _iter != searchNodeQ.front()->getChildNode()->end(); _iter++)
+		{
+			if(!strcmp(_iter->getTagName(),str)) searchNodeQ.push(&(*_iter));
+		}
+		searchNodeQ.pop();
+	}
+}
+
 void XPath::AddNodeList(XMLNode* node)
 {
 	nodeList.push_back(node);
@@ -65,11 +195,20 @@ void XPath::ClearNodeList()
 	nodeList.clear();
 }
 
-void XPath::PrintNodeList(printType _type)
+void XPath::PrintNodeList(PrintType _type)
 {
 	std::list<XMLNode *>::iterator _iter;
 	for(_iter = nodeList.begin(); _iter != nodeList.end(); _iter++)
 	{
 		(*_iter)->PrintNode(_type);
+	}
+}
+
+void XPath::PrintNodeQ()
+{
+	while(searchNodeQ.size())
+	{
+		searchNodeQ.front()->PrintNode(printType);
+		searchNodeQ.pop();
 	}
 }

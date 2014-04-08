@@ -14,7 +14,7 @@
 #define MAX_CHAR_SIZE 500
 #define MAX_BUF_SIZE 800
 
-enum printType { print_TagName, print_Content, print_AtrName, print_AtrValue};
+enum PrintType { print_TagName, print_Content, print_AtrName, print_AtrValue};
 
 struct tagAttribute
 {
@@ -79,7 +79,7 @@ public:
 	void PrintContent();
 	void PrintTagName();
 	void PrintAttribute();
-	void PrintNode(printType _type);
+	void PrintNode(PrintType _type);
 };
 
 #endif /* XMLNODE_H_ */
