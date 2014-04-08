@@ -29,11 +29,22 @@ private:
 	std::queue<XMLNode*> searchNodeQ;
 	PrintType printType;
 
+	char* cmdBuf; // 커맨드 한 줄의 버퍼
+	char* strBuf; // 커맨드 한 줄에서 일정한 기준으로 끊어낸 커맨드 저장용 버퍼
 	bool firstCallSearch_All;
+	int cmdIdx;
 
 public:
 	bool checkAlpha(const char ch);
 	bool checkNumber(const char ch);
+	int checkAnyChar(const char* str, const char _ch, const char _last);
+
+	void RemoveBlank();
+	void ClearQ();
+	void PopQ(int _num);
+	void StrCpyFromCmdBuf();
+	void NumberCpyFromCmdBuf();
+	void ErrorCollection(const char* str);
 
 	int XPathCmdParser(char* _cmdBuf, XMLNode* _XpathRoute);//cmd분석 함수.
 	void Search_All_NonString(XMLNode* _XpathRoute);
