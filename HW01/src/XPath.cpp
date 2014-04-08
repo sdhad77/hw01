@@ -55,7 +55,27 @@ int XPath::XPathCmdParser(char* _cmdBuf, XMLNode* _XpathRoute)
 				}
 				else if(_cmdBuf[_cmdIdx+2] == '@')
 				{
-					1;
+					if(checkAlpha(_cmdBuf[_cmdIdx+3]))
+					{
+						_cmdIdx = _cmdIdx + 3;
+						_startIdx = _cmdIdx;
+						while(checkAlpha(_cmdBuf[_cmdIdx])) _cmdIdx++;
+						strncpy(_strBuf, &_cmdBuf[_startIdx], _cmdIdx-_startIdx);
+						_strBuf[_cmdIdx-_startIdx] = '\0';
+
+						while(_cmdBuf[_cmdIdx] == ' ') _cmdIdx++; //공백제거
+
+						while(searchNodeQ.size()) searchNodeQ.pop();
+
+						Search_All(_XpathRoute, _strBuf, search_AttributeName);
+			//			int tempQSize = searchNodeQ.size(); //  "//"을 이용한 검색을 아무곳에서나 하고 싶으면 주석 해제하고 위에 Search_All 주석처리.
+			//			for(int i=0; i < tempQSize; i++) Search_All(searchNodeQ.front(), _strBuf, search_AttributeName);
+						printType = print_AtrValue;
+					}
+					else
+					{
+						std::cout << "해당 속성이 존재하지 않습니다." << std::endl;
+					}
 				}
 				else if(checkAlpha(_cmdBuf[_cmdIdx+2]))
 				{
@@ -67,8 +87,11 @@ int XPath::XPathCmdParser(char* _cmdBuf, XMLNode* _XpathRoute)
 
 					while(_cmdBuf[_cmdIdx] == ' ') _cmdIdx++; //공백제거
 
-					searchNodeQ.pop();
+					while(searchNodeQ.size()) searchNodeQ.pop();
+
 					Search_All(_XpathRoute, _strBuf, search_TagName);
+		//			int tempQSize = searchNodeQ.size(); //  "//"을 이용한 검색을 아무곳에서나 하고 싶으면 주석 해제하고 위에 Search_All 주석처리.
+		//			for(int i=0; i < tempQSize; i++) Search_All(searchNodeQ.front(), _strBuf, search_TagName);
 					printType = print_Content;
 				}
 				else
@@ -171,12 +194,11 @@ void XPath::Search_All(XMLNode* _XpathRoute, const char* str, CommandType _comma
 		if(!strcmp(_XpathRoute->getTagName(), str)) searchNodeQ.push(_XpathRoute);
 	}
 
-	else if(_commandType == search_Attribute)
+	else if(_commandType == search_AttributeName)
 	{
 		for(_iter2 = _XpathRoute->getAttribute()->begin(); _iter2 != _XpathRoute->getAttribute()->end(); _iter2++)
 		{
-			if(!strcmp(_iter2->getName(), str))			std::cout << _iter2->getName() << "\t" << _iter2->getValue() << std::endl;
-			else if(!strcmp(_iter2->getValue(), str))	std::cout << _iter2->getName() << "\t" << _iter2->getValue() << std::endl;
+			if(!strcmp(_iter2->getName(), str)) searchNodeQ.push(_XpathRoute);
 		}
 	}
 

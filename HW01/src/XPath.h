@@ -17,7 +17,7 @@
 #define MAX_CHAR_SIZE 500
 #define MAX_BUF_SIZE 800
 
-enum CommandType { search_TagName, search_Attribute};
+enum CommandType { search_TagName, search_AttributeName};
 
 class XPath {
 public:
