@@ -8,30 +8,30 @@
 #include "XMLNode.h"
 
 XMLNode::XMLNode() {
-	tagName = new char[MAX_CHAR_SIZE];
-	content = new char[MAX_CHAR_SIZE];
+	name = new char[MAX_CHAR_SIZE];
+	value = new char[MAX_CHAR_SIZE];
 	parentNode = NULL;
-	tagName[0] = '\0';
-	content[0] = '\0';
+	name[0] = '\0';
+	value[0] = '\0';
 }
 
 XMLNode::XMLNode(const XMLNode& node)
 {
-	tagName = new char[MAX_CHAR_SIZE];
-	content = new char[MAX_CHAR_SIZE];
-	tagName[0] = '\0';
-	content[0] = '\0';
+	name = new char[MAX_CHAR_SIZE];
+	value = new char[MAX_CHAR_SIZE];
+	name[0] = '\0';
+	value[0] = '\0';
 
-	strcpy(tagName, node.tagName);
-	strcpy(content, node.content);
+	strcpy(name, node.name);
+	strcpy(value, node.value);
 	parentNode = node.parentNode;
 	childNode = node.childNode;
 	attribute = node.attribute;
 }
 
 XMLNode::~XMLNode() {
-	delete[] tagName;
-	delete[] content;
+	delete[] name;
+	delete[] value;
 }
 
 int XMLNode::checkChar(const char* str, const char _ch)
@@ -98,33 +98,33 @@ char* XMLNode::checkAmp(char* str)
 	return str;
 }
 
-char* XMLNode::getTagName()
+char* XMLNode::getName()
 {
-	return tagName;
+	return name;
 }
 
-void XMLNode::setTagName(const char* _tagName)
+void XMLNode::setName(const char* _name)
 {
-	strcpy(tagName, _tagName);
-	checkAmp(tagName);
+	strcpy(name, _name);
+	checkAmp(name);
 }
 
-char* XMLNode::getContent()
+char* XMLNode::getValue()
 {
-	return content;
+	return value;
 }
 
-void XMLNode::setContent(const char* _content)
+void XMLNode::setValue(const char* _value)
 {
-	if(content[0] != '\0')
+	if(value[0] != '\0')
 	{
-		strcat(content, " ");
-		strcat(content, _content);
+		strcat(value, " ");
+		strcat(value, _value);
 	}
 	else
 	{
-		strcpy(content, _content);
-		checkAmp(content);
+		strcpy(value, _value);
+		checkAmp(value);
 	}
 }
 
@@ -147,29 +147,29 @@ void XMLNode::setChildNode(const XMLNode* _childNode)
 	childNode.push_back(*_childNode);
 }
 
-std::list<tagAttribute>* XMLNode::getAttribute()
+std::list<XMLNode>* XMLNode::getAttribute()
 {
 	return &attribute;
 }
 
-void XMLNode::setAttribute(const tagAttribute* _attribute)
+void XMLNode::setAttribute(const XMLNode* _attribute)
 {
 	attribute.push_back(*_attribute);
 }
 
-void XMLNode::PrintContent()
+void XMLNode::PrintValue()
 {
-	std::cout << getContent() << std::endl;
+	std::cout << getValue() << std::endl;
 }
 
-void XMLNode::PrintTagName()
+void XMLNode::PrintName()
 {
-	std::cout << getTagName() << std::endl;
+	std::cout << getName() << std::endl;
 }
 
 void XMLNode::PrintAttribute()
 {
-	std::list<tagAttribute>::iterator _iter2;
+	std::list<XMLNode>::iterator _iter2;
 	for(_iter2 = attribute.begin(); _iter2 != attribute.end(); _iter2++)
 	{
 		std::cout << _iter2->getName() << " : " << _iter2->getValue() << std::endl;
@@ -178,8 +178,6 @@ void XMLNode::PrintAttribute()
 
 void XMLNode::PrintNode(PrintType _type)
 {
-	if(_type == print_TagName) 		PrintTagName();
-	else if(_type == print_Content)	PrintContent();
-	else if(_type == print_AtrName)	PrintAttribute();
-	else if(_type == print_AtrValue)PrintAttribute();
+	if(_type == print_Name) 		PrintName();
+	else if(_type == print_Value)	PrintValue();
 }

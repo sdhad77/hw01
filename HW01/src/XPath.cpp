@@ -8,7 +8,7 @@
 #include "XPath.h"
 
 XPath::XPath() {
-	printType = print_Content;
+	printType = print_Value;
 }
 
 XPath::~XPath() {
@@ -51,7 +51,7 @@ int XPath::XPathCmdParser(char* _cmdBuf, XMLNode* _XpathRoute)
 				{
 					Search_All(_XpathRoute);
 					_cmdIdx = _cmdIdx + 3;
-					printType = print_TagName;
+					printType = print_Name;
 				}
 				else if(_cmdBuf[_cmdIdx+2] == '@')
 				{
@@ -70,11 +70,11 @@ int XPath::XPathCmdParser(char* _cmdBuf, XMLNode* _XpathRoute)
 						Search_All(_XpathRoute, _strBuf, search_AttributeName);
 			//			int tempQSize = searchNodeQ.size(); //  "//"을 이용한 검색을 아무곳에서나 하고 싶으면 주석 해제하고 위에 Search_All 주석처리.
 			//			for(int i=0; i < tempQSize; i++) Search_All(searchNodeQ.front(), _strBuf, search_AttributeName);
-						printType = print_AtrValue;
+						printType = print_Value;
 					}
 					else
 					{
-						std::cout << "해당 속성이 존재하지 않습니다." << std::endl;
+						std::cout << "잘못입력하였습니다." << std::endl;
 					}
 				}
 				else if(checkAlpha(_cmdBuf[_cmdIdx+2]))
@@ -92,7 +92,7 @@ int XPath::XPathCmdParser(char* _cmdBuf, XMLNode* _XpathRoute)
 					Search_All(_XpathRoute, _strBuf, search_TagName);
 		//			int tempQSize = searchNodeQ.size(); //  "//"을 이용한 검색을 아무곳에서나 하고 싶으면 주석 해제하고 위에 Search_All 주석처리.
 		//			for(int i=0; i < tempQSize; i++) Search_All(searchNodeQ.front(), _strBuf, search_TagName);
-					printType = print_Content;
+					printType = print_Value;
 				}
 				else
 				{
@@ -111,7 +111,7 @@ int XPath::XPathCmdParser(char* _cmdBuf, XMLNode* _XpathRoute)
 				_strBuf[_cmdIdx-_startIdx] = '\0';
 
 				Search_Child(_strBuf);
-				printType = print_Content;
+				printType = print_Value;
 			}
 			else
 			{
@@ -138,7 +138,7 @@ int XPath::XPathCmdParser(char* _cmdBuf, XMLNode* _XpathRoute)
 						while(--selectCnt) searchNodeQ.pop();
 						searchNodeQ.push(searchNodeQ.front());
 						while(searchNodeQ.size()-1) searchNodeQ.pop();
-						printType = print_Content;
+						printType = print_Value;
 					}
 					else
 					{
@@ -187,18 +187,18 @@ void XPath::Search_All(XMLNode* _XpathRoute)
 void XPath::Search_All(XMLNode* _XpathRoute, const char* str, CommandType _commandType)
 {
 	std::list<XMLNode>::iterator _iter;
-	std::list<tagAttribute>::iterator _iter2;
+	std::list<XMLNode>::iterator _iter2;
 
 	if(_commandType == search_TagName)
 	{
-		if(!strcmp(_XpathRoute->getTagName(), str)) searchNodeQ.push(_XpathRoute);
+		if(!strcmp(_XpathRoute->getName(), str)) searchNodeQ.push(_XpathRoute);
 	}
 
 	else if(_commandType == search_AttributeName)
 	{
 		for(_iter2 = _XpathRoute->getAttribute()->begin(); _iter2 != _XpathRoute->getAttribute()->end(); _iter2++)
 		{
-			if(!strcmp(_iter2->getName(), str)) searchNodeQ.push(_XpathRoute);
+			if(!strcmp(_iter2->getName(), str)) searchNodeQ.push(&(*_iter2));
 		}
 	}
 
@@ -216,7 +216,7 @@ void XPath::Search_Child(const char* str)
 	{
 		for(_iter = searchNodeQ.front()->getChildNode()->begin(); _iter != searchNodeQ.front()->getChildNode()->end(); _iter++)
 		{
-			if(!strcmp(_iter->getTagName(),str)) searchNodeQ.push(&(*_iter));
+			if(!strcmp(_iter->getName(),str)) searchNodeQ.push(&(*_iter));
 		}
 		searchNodeQ.pop();
 	}

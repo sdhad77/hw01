@@ -103,13 +103,13 @@ void XMLParser::parserStartTag()
 	{
 		isRoute = false;
 		XpathRoute->setParentNode(XpathRoute);
-		XpathRoute->setTagName(tempElement);
+		XpathRoute->setName(tempElement);
 	}
 	else
 	{
 		XMLNode temp;
 		XMLNode* currentNode = XpathRoute;
-		temp.setTagName(tempElement);
+		temp.setName(tempElement);
 		XpathRoute->setChildNode(&temp);
 		XpathRoute = &XpathRoute->getChildNode()->back();
 		XpathRoute->setParentNode(currentNode);
@@ -130,7 +130,7 @@ void XMLParser::parserContent()
 	strncpy(tempBuf, &buf[idx], endIdx);
 	tempBuf[endIdx] = '\0';
 	idx = idx + endIdx;
-	XpathRoute->setContent(tempBuf);
+	XpathRoute->setValue(tempBuf);
 }
 
 void XMLParser::parserAttribute(int _blankNum)
@@ -141,7 +141,7 @@ void XMLParser::parserAttribute(int _blankNum)
 
 		if(tempBuf[_blankNum] != '\0')
 		{
-			tagAttribute tempAttribute;
+			XMLNode tempAttribute;
 			int _startIdx = _blankNum;
 			int _endIdx = checkChar(&tempBuf[_startIdx], '=');
 
