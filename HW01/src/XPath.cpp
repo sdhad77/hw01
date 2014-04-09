@@ -20,6 +20,7 @@ XPath::~XPath() {
 	delete[] strBuf;
 }
 
+//ch가 알파벳인지 검사하는 함수
 bool XPath::checkAlpha(const char ch)
 {
 	if ('a' <= ch && ch <= 'z') return true;
@@ -27,13 +28,14 @@ bool XPath::checkAlpha(const char ch)
 	else return false;
 }
 
+//ch가 숫자인지 검사하는 함수
 bool XPath::checkNumber(const char ch)
 {
 	if ('0' <= ch && ch <= '9') return true;
 	else return false;
 }
 
-//str 에서 _ch문자가 있는지 검사하는 함수. 문자열 처음부터 _last 문자가 나타날때 까지 루프를 반복함.
+//문자열str 에서 _ch문자가 있는지 검사하는 함수. 문자열 처음부터 _last 문자가 나타날때 까지 루프를 반복함.
 int XPath::checkAnyChar(const char* str, const char _ch, const char _last)
 {
 	int _idx = 0;
@@ -68,9 +70,9 @@ void XPath::PopQ(int _num)
 //cmd버퍼로부터 단어단위로 잘라서 strBuf에 저장.
 void XPath::StrCpyFromCmdBuf()
 {
-	int _startIdx = cmdIdx;
-	while(checkAlpha(cmdBuf[cmdIdx])) cmdIdx++;
-	strncpy(strBuf, &cmdBuf[_startIdx], cmdIdx-_startIdx);
+	int _startIdx = cmdIdx; //복사할 문자열의 시작 인덱스 저장.
+	while(checkAlpha(cmdBuf[cmdIdx])) cmdIdx++; //알파벳이 아닌 문자가 나올때까지 인덱스 이동
+	strncpy(strBuf, &cmdBuf[_startIdx], cmdIdx-_startIdx); //문자열 시작점부터 문자가 아닌것 직전까지 복사함
 	strBuf[cmdIdx-_startIdx] = '\0';
 }
 
@@ -98,7 +100,7 @@ void XPath::ErrorCollection(const char* str)
 	else if(!strcmp(str, "[name~$"))std::cout << "[a 이후 처리되지 않은 문자가 입력되었습니다." << std::endl;
 	else							std::cout << "error" << std::endl;
 
-	cmdBuf[cmdIdx] = '\0';
+	cmdBuf[cmdIdx] = '\0'; //XPathCmdParser()의 while 반복문 정지시키는 기능.
 	ClearQ();
 }
 
@@ -124,18 +126,23 @@ int XPath::XPathCmdParser(char* _cmdBuf, XMLNode* _XpathRoute)
 	{
 		RemoveBlank();
 
+		//cmd : /
 		if(cmdBuf[cmdIdx] == '/')
 		{
+			//cmd : //
 			if(cmdBuf[cmdIdx+1] == '/')
 			{
+				//cmd : //*
 				if(cmdBuf[cmdIdx+2] == '*')
 				{
 					cmdIdx = cmdIdx + 3;
 					Search_All_NonString(_XpathRoute);//문자열에 관계없이 루트노드부터 전부 저장.
 					printType = print_Name;
 				}
+				//cmd : //@
 				else if(cmdBuf[cmdIdx+2] == '@')
 				{
+					//cmd : //@attributeName
 					if(checkAlpha(cmdBuf[cmdIdx+3]))
 					{
 						cmdIdx = cmdIdx + 3;//cmd버퍼의 인덱스를 첫번째 알파벳으로 위치시킴.
@@ -148,6 +155,7 @@ int XPath::XPathCmdParser(char* _cmdBuf, XMLNode* _XpathRoute)
 					}
 					else ErrorCollection("//@");
 				}
+				//cmd : //tagName
 				else if(checkAlpha(cmdBuf[cmdIdx+2]))
 				{
 					cmdIdx = cmdIdx + 2;
@@ -159,6 +167,7 @@ int XPath::XPathCmdParser(char* _cmdBuf, XMLNode* _XpathRoute)
 				}
 				else ErrorCollection("//");
 			}
+			//cmd : /*
 			else if(cmdBuf[cmdIdx+1] == '*')
 			{
 				int tempQSize = searchNodeQ.size();
@@ -170,6 +179,7 @@ int XPath::XPathCmdParser(char* _cmdBuf, XMLNode* _XpathRoute)
 				cmdIdx = cmdIdx + 2;
 				printType = print_Name;
 			}
+			//cmd : /tagName
 			else if(checkAlpha(cmdBuf[cmdIdx+1]))
 			{
 				cmdIdx = cmdIdx + 1;
@@ -179,14 +189,17 @@ int XPath::XPathCmdParser(char* _cmdBuf, XMLNode* _XpathRoute)
 			}
 			else ErrorCollection("/");
 		}
+		//cmd : [
 		else if(cmdBuf[cmdIdx] == '[')
 		{
+			//cmd : [1
 			if(checkNumber(cmdBuf[cmdIdx+1]))
 			{
 				cmdIdx = cmdIdx + 1;
 				NumberCpyFromCmdBuf();
 				RemoveBlank();
 
+				//cmd : [1]
 				if(cmdBuf[cmdIdx] == ']')
 				{
 					cmdIdx++;
@@ -202,12 +215,15 @@ int XPath::XPathCmdParser(char* _cmdBuf, XMLNode* _XpathRoute)
 				}
 				else ErrorCollection("[999");
 			}
+			//cmd : [a
 			else if(checkAlpha(cmdBuf[cmdIdx+1]))
 			{
+				//cmd : [func(
 				if(checkAnyChar(&cmdBuf[cmdIdx+1], '(', ']'))
 				{
 					int checkFunc = checkAnyChar(&cmdBuf[cmdIdx+1], '(', ']');
 
+					//cmd : [func()]
 					if(cmdBuf[cmdIdx + 1 + checkFunc + 1] == ')')
 					{
 						std::cout << "함수" << std::endl;
@@ -217,15 +233,18 @@ int XPath::XPathCmdParser(char* _cmdBuf, XMLNode* _XpathRoute)
 				}
 				else ErrorCollection("[name~$");
 			}
+			//cmd : [@
 			else if(cmdBuf[cmdIdx] == '@')
 			{
 				cmdBuf[cmdIdx] = '\0';
 			}
 			else ErrorCollection("[~");
 		}
+		//cmd가 /,[ 로 시작하지 않을때.
 		else ErrorCollection("cmd");
 	}
 
+	//searchNodeQ에 있는 노드들 출력
 	PrintNodeQ();
 
 	delete tempNode;
@@ -233,6 +252,8 @@ int XPath::XPathCmdParser(char* _cmdBuf, XMLNode* _XpathRoute)
 	return 0;
 }
 
+//전체순회탐색인 Search_All을 호출하는 함수.
+//Search_All을 바로 호출할 경우 큐에 불필요한 값이 저장되기에 이 함수를 거쳐서 호출해야함.
 void XPath::Search_All_NonString(XMLNode* _XpathRoute)
 {
 	firstCallSearch_All = true;
@@ -240,16 +261,19 @@ void XPath::Search_All_NonString(XMLNode* _XpathRoute)
 	Search_All(_XpathRoute);
 }
 
+//전체순회탐색 함수. cmd의 문자열과 상관없이 _XpathRoute 이하의 모든 노드를 저장하는 함수.
 void XPath::Search_All(XMLNode* _XpathRoute)
 {
+	//첫 호출인지 아닌지 검사
 	if(!firstCallSearch_All) searchNodeQ.push(_XpathRoute);
 	else firstCallSearch_All = false;
 
 	std::list<XMLNode>::iterator _iter;
 	for(_iter = _XpathRoute->getChildNode()->begin(); _iter != _XpathRoute->getChildNode()->end(); _iter++)
-			Search_All(&(*_iter));
+			Search_All(&(*_iter)); // 재귀 호출
 }
 
+//전체순회탐색 함수. 검사할 문자열인 str과 일치하는 노드들만 저장함.
 void XPath::Search_All(XMLNode* _XpathRoute, const char* str, CommandType _commandType)
 {
 	std::list<XMLNode>::iterator _iter;
@@ -273,6 +297,7 @@ void XPath::Search_All(XMLNode* _XpathRoute, const char* str, CommandType _comma
 }
 
 //searchNodeQ 를 이용한 탐색
+//문자열 str과 일치하는 자식 노드들만 큐에 저장함.
 void XPath::Search_Child(const char* str)
 {
 	std::list<XMLNode>::iterator _iter;
@@ -288,25 +313,7 @@ void XPath::Search_Child(const char* str)
 	}
 }
 
-void XPath::AddNodeList(XMLNode* node)
-{
-	nodeList.push_back(node);
-}
-
-void XPath::ClearNodeList()
-{
-	nodeList.clear();
-}
-
-void XPath::PrintNodeList(PrintType _type)
-{
-	std::list<XMLNode *>::iterator _iter;
-	for(_iter = nodeList.begin(); _iter != nodeList.end(); _iter++)
-	{
-		(*_iter)->PrintNode(_type);
-	}
-}
-
+//printType
 void XPath::PrintNodeQ()
 {
 	while(searchNodeQ.size())
