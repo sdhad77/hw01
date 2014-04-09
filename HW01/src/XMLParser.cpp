@@ -157,8 +157,6 @@ void XMLParser::parserAttribute(int _blankNum)
 			tempAttributeValue[_endIdx] = '\0';
 			tempAttribute.setValue(tempAttributeValue);
 
-			XpathRoute->checkAmp(tempAttribute.getName());
-			XpathRoute->checkAmp(tempAttribute.getValue());
 			XpathRoute->setAttribute(&tempAttribute);
 			XpathRoute->getAttribute()->back().setParentNode(XpathRoute);
 

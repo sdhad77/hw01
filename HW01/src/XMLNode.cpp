@@ -64,10 +64,9 @@ char* XMLNode::checkAmp(char* str)
 
 	while(1)
 	{
-		//aaa&quot;bbb -> 기본 형태. &quot;를 예제로 설명.
+		//aaa&quot;bbb -> 기본 형태. &quot;을 예제로 설명.
 		char* tempCheckAmp = new char[MAX_CHAR_SIZE];
 		char* tempCheckAmp2 = new char[MAX_CHAR_SIZE];
-		char* tempCheckAmp3 = new char[MAX_CHAR_SIZE];
 
 		ampEnd	= checkAnyChar(str, ';', '\0');	//;가 존재하는지 검사
 		charEnd	= checkAnyChar(str, '\0', '\0');//문자열 끝나는 지점 검사
@@ -75,28 +74,26 @@ char* XMLNode::checkAmp(char* str)
 		strncpy(tempCheckAmp, &str[_idx+1], ampEnd -_idx - 1); //&quot; -> quot 만 따로 저장
 		tempCheckAmp[ampEnd -_idx - 1] = '\0';	//quot 뒤에 \0 붙여줌
 
+		strncpy(tempCheckAmp2, &str[ampEnd+1], charEnd-ampEnd);  //bbb만 분리
+
 		//문자열에서 &와 ;사이에 있던 문자열이 무엇인지 검사 후 기호로 변경
-		if(!strcmp(tempCheckAmp, "lt"))			tempCheckAmp = (char*)"<";
-		else if(!strcmp(tempCheckAmp, "gt"))	tempCheckAmp = (char*)">";
-		else if(!strcmp(tempCheckAmp, "amp"))	tempCheckAmp = (char*)"&";
-		else if(!strcmp(tempCheckAmp, "apos"))	tempCheckAmp = (char*)"'";
-		else if(!strcmp(tempCheckAmp, "quot"))	tempCheckAmp = (char*)"\"";
+		if(!strcmp(tempCheckAmp, "lt"))			str[_idx] = '<';
+		else if(!strcmp(tempCheckAmp, "gt"))	str[_idx] = '>';
+		else if(!strcmp(tempCheckAmp, "amp"))	str[_idx] = '&';
+		else if(!strcmp(tempCheckAmp, "apos"))	str[_idx] = '\'';
+		else if(!strcmp(tempCheckAmp, "quot"))	str[_idx] = '"';
 		else
 		{
 			std::cout << "존재하지 않는 Entity입니다." << std::endl;
 			std::cout << str << std::endl;
 			break;
 		}
-																		//aaa&quot;bbb -> 기본형태
-		strncpy(tempCheckAmp3, str, _idx); tempCheckAmp3[_idx] = '\0';	//aaa만 분리
-		strncpy(tempCheckAmp2, &str[ampEnd+1], charEnd-ampEnd);			//bbb만 분리
-		strcat(tempCheckAmp3, tempCheckAmp);							//aaa' -> quot에 해당하는 기호를 aaa 뒤에 붙임
-		strcat(tempCheckAmp3, tempCheckAmp2);							//aaa'bbb 위의 문자열들을 합침
-		strcpy(str, tempCheckAmp3);										//aaa'bbb 합쳐진 문자열을 str로 카피
+
+		//기호로 변경한 문자 바로 뒤에 아까 분리한 bbb 부분을 이어 붙임
+		strncpy(&str[_idx+1], tempCheckAmp2, charEnd-ampEnd);
 
 		delete[] tempCheckAmp;
 		delete[] tempCheckAmp2;
-		delete[] tempCheckAmp3;
 
 		//남은 문자열에서 &가 있는지 검사하고, 없을경우 break; 기호로 수정한 이후의 문자열을 검사하기 때문에 &amp; -> &변환에 대해 안전함
 		if(checkAnyChar(&str[_idx+1], '&', '\0') == -2) break;
