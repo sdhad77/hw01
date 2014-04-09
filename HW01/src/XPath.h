@@ -9,6 +9,7 @@
 #include <list>
 #include <string>
 #include <queue>
+#include "XString.h"
 #include "XMLNode.h"
 
 #ifndef XPATH_H_
@@ -19,7 +20,7 @@
 
 enum CommandType { search_TagName, search_AttributeName};
 
-class XPath {
+class XPath : public XString {
 public:
 	XPath();
 	virtual ~XPath();
@@ -34,11 +35,6 @@ private:
 	bool firstCallSearch_All; //Search_All 함수가 처음 호출됐는지 확인하기 위한 변수
 
 public:
-	bool checkAlpha(const char ch); //문자 ch가 알파벳인지
-	bool checkNumber(const char ch);//문자 ch가 숫자인지
-	int checkAnyChar(const char* str, const char _ch, const char _last); //문자열 str에서 _ch문자 찾기. _last 문자가 등장하기 전까지 찾음.
-
-	void RemoveBlank(); //&cmdBuf[cmdIdx] 에서 부터 공백 제거
 	void ClearQ(); //searchNodeQ 큐를 비움. pop() 사용.
 	void PopQ(int _num); //_num 횟수만큼 pop 사용.
 	void StrCpyFromCmdBuf(); //cmdBuf에서 strBuf로 알파벳인 문자열 일부 복사.

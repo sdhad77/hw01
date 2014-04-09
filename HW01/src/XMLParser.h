@@ -27,6 +27,7 @@ private:
 	char* tempAttributeValue;
 	char* buf;			//input 파일을 한줄씩 읽어오기 위한 버퍼
 	char* tempBuf;		//buf에 저장된 문자들을 태그를 기준으로 자르기 위한 버퍼
+	XMLNode* XpathRoute;
 
 	int idx;
 	int startIdx;
@@ -35,12 +36,12 @@ private:
 	bool isEmptyTag;
 
 public:
-	XMLNode* XpathRoute;
 	bool checkAlpha(const char ch);
 	bool checkNumber(const char ch);
 	int checkAnyChar(const char* str, const char _ch, const char _last);
 	char* checkAmp(char* str);
 	bool checkByteOrderMark();
+
 	int parser(const char* fileName, XMLNode* _XMLNode);
 	void parserPI();
 	void parserDTD();

@@ -20,40 +20,6 @@ XPath::~XPath() {
 	delete[] strBuf;
 }
 
-//ch가 알파벳인지 검사하는 함수
-bool XPath::checkAlpha(const char ch)
-{
-	if ('a' <= ch && ch <= 'z') return true;
-	else if ('A' <= ch && ch <= 'Z') return true;
-	else return false;
-}
-
-//ch가 숫자인지 검사하는 함수
-bool XPath::checkNumber(const char ch)
-{
-	if ('0' <= ch && ch <= '9') return true;
-	else return false;
-}
-
-//문자열str 에서 _ch문자가 있는지 검사하는 함수. 문자열 처음부터 _last 문자가 나타날때 까지 루프를 반복함.
-int XPath::checkAnyChar(const char* str, const char _ch, const char _last)
-{
-	int _idx = 0;
-	while (str[_idx] != _last)
-	{
-		if(str[_idx] == _ch) return _idx;
-		_idx++;
-	}
-
-	return -1;
-}
-
-//공백제거
-void XPath::RemoveBlank()
-{
-	while(cmdBuf[cmdIdx] == ' ' || cmdBuf[cmdIdx] == '\t') cmdIdx++;
-}
-
 //노드 저장용 큐 비우기
 void XPath::ClearQ()
 {
@@ -124,7 +90,7 @@ int XPath::XPathCmdParser(char* _cmdBuf, XMLNode* _XpathRoute)
 
 	while(cmdBuf[cmdIdx] != '\0')
 	{
-		RemoveBlank();
+		RemoveBlank(cmdBuf, &cmdIdx);
 
 		//cmd : /
 		if(cmdBuf[cmdIdx] == '/')
@@ -145,11 +111,11 @@ int XPath::XPathCmdParser(char* _cmdBuf, XMLNode* _XpathRoute)
 					//cmd : //@attributeName
 					if(checkAlpha(cmdBuf[cmdIdx+3]))
 					{
-						cmdIdx = cmdIdx + 3;//cmd버퍼의 인덱스를 첫번째 알파벳으로 위치시킴.
-						StrCpyFromCmdBuf();	//cmd버퍼에서 단어단위로 잘라서 복사함.
-						RemoveBlank();		//잘라낸 이후에 공백이 있을수도 있으니 cmd버퍼의 공백 제거
-						ClearQ();			//노드를 저장할 큐를 비움.
-											//루트부터 잘라낸 str과 일치하는 속성이름을 검색하여 큐에 저장함.
+						cmdIdx = cmdIdx + 3;			//cmd버퍼의 인덱스를 첫번째 알파벳으로 위치시킴.
+						StrCpyFromCmdBuf();				//cmd버퍼에서 단어단위로 잘라서 복사함.
+						RemoveBlank(cmdBuf, &cmdIdx);	//잘라낸 이후에 공백이 있을수도 있으니 cmd버퍼의 공백 제거
+						ClearQ();						//노드를 저장할 큐를 비움.
+														//루트부터 잘라낸 str과 일치하는 속성이름을 검색하여 큐에 저장함.
 						Search_All(_XpathRoute, strBuf, search_AttributeName);
 						printType = print_Value;//출력값을 value로 설정.
 					}
@@ -160,7 +126,7 @@ int XPath::XPathCmdParser(char* _cmdBuf, XMLNode* _XpathRoute)
 				{
 					cmdIdx = cmdIdx + 2;
 					StrCpyFromCmdBuf();
-					RemoveBlank();
+					RemoveBlank(cmdBuf, &cmdIdx);
 					ClearQ();
 					Search_All(_XpathRoute, strBuf, search_TagName);
 					printType = print_Value;
@@ -197,7 +163,7 @@ int XPath::XPathCmdParser(char* _cmdBuf, XMLNode* _XpathRoute)
 			{
 				cmdIdx = cmdIdx + 1;
 				NumberCpyFromCmdBuf();
-				RemoveBlank();
+				RemoveBlank(cmdBuf, &cmdIdx);
 
 				//cmd : [1]
 				if(cmdBuf[cmdIdx] == ']')
