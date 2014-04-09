@@ -19,7 +19,7 @@ enum PrintType { print_Name, print_Value};
 class XMLNode {
 public:
 	XMLNode();
-	XMLNode(const XMLNode& node);
+	XMLNode(const XMLNode& node); //default copy constructor. list의 push 때문에 작성.
 	virtual ~XMLNode();
 
 private:
@@ -30,7 +30,7 @@ private:
 	std::list<XMLNode> childNode;
 
 public:
-	int checkChar(const char* str, const char _ch);
+	int checkAnyChar(const char* str, const char _ch, const char _last);
 	char* checkAmp(char* str);
 
 	char* getName();
