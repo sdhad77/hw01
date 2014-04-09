@@ -35,74 +35,6 @@ XMLNode::~XMLNode() {
 	delete[] value;
 }
 
-//문자열str 에서 _ch문자가 있는지 검사하는 함수. 문자열 처음부터 _last 문자가 나타날때 까지 루프를 반복함.
-int XMLNode::checkAnyChar(const char* str, const char _ch, const char _last)
-{
-	int _idx = 0;
-	while (str[_idx] != _last)
-	{
-		if(str[_idx] == _ch) return _idx;
-		_idx++;
-	}
-
-	//_last까지 검사하였는데 &가 나타나지 않았을경우.
-	//&quot; 등을 검사하는 checkAmp() 함수에서 벗어나기 위해 존재함.
-	if(_ch == '&') return -2;
-
-	return _idx;
-}
-
-//문자열str에 &quot;와 같은 Entity들을 검사하고 바꿔주는 함수.
-//이 함수를 거치면 &quot; -> " 이런 형태로 문자가 바뀜.
-char* XMLNode::checkAmp(char* str)
-{
-	int _idx = checkAnyChar(str, '&','\0');
-	if(_idx == -2) return str;
-
-	int ampEnd;
-	int charEnd;
-
-	while(1)
-	{
-		//aaa&quot;bbb -> 기본 형태. &quot;을 예제로 설명.
-		char* tempCheckAmp = new char[MAX_CHAR_SIZE];
-		char* tempCheckAmp2 = new char[MAX_CHAR_SIZE];
-
-		ampEnd	= checkAnyChar(str, ';', '\0');	//;가 존재하는지 검사
-		charEnd	= checkAnyChar(str, '\0', '\0');//문자열 끝나는 지점 검사
-
-		strncpy(tempCheckAmp, &str[_idx+1], ampEnd -_idx - 1); //&quot; -> quot 만 따로 저장
-		tempCheckAmp[ampEnd -_idx - 1] = '\0';	//quot 뒤에 \0 붙여줌
-
-		strncpy(tempCheckAmp2, &str[ampEnd+1], charEnd-ampEnd);  //bbb만 분리
-
-		//문자열에서 &와 ;사이에 있던 문자열이 무엇인지 검사 후 기호로 변경
-		if(!strcmp(tempCheckAmp, "lt"))			str[_idx] = '<';
-		else if(!strcmp(tempCheckAmp, "gt"))	str[_idx] = '>';
-		else if(!strcmp(tempCheckAmp, "amp"))	str[_idx] = '&';
-		else if(!strcmp(tempCheckAmp, "apos"))	str[_idx] = '\'';
-		else if(!strcmp(tempCheckAmp, "quot"))	str[_idx] = '"';
-		else
-		{
-			std::cout << "존재하지 않는 Entity입니다." << std::endl;
-			std::cout << str << std::endl;
-			break;
-		}
-
-		//기호로 변경한 문자 바로 뒤에 아까 분리한 bbb 부분을 이어 붙임
-		strncpy(&str[_idx+1], tempCheckAmp2, charEnd-ampEnd);
-
-		delete[] tempCheckAmp;
-		delete[] tempCheckAmp2;
-
-		//남은 문자열에서 &가 있는지 검사하고, 없을경우 break; 기호로 수정한 이후의 문자열을 검사하기 때문에 &amp; -> &변환에 대해 안전함
-		if(checkAnyChar(&str[_idx+1], '&', '\0') == -2) break;
-		_idx = _idx + checkAnyChar(&str[_idx+1], '&', '\0') + 1;//새로운 & 시작점을 찾아서 _idx에 저장
-	}
-
-	return str;
-}
-
 char* XMLNode::getName()
 {
 	return name;
@@ -111,7 +43,6 @@ char* XMLNode::getName()
 void XMLNode::setName(const char* _name)
 {
 	strcpy(name, _name);
-	checkAmp(name);
 }
 
 char* XMLNode::getValue()
@@ -129,8 +60,6 @@ void XMLNode::setValue(const char* _value)
 	}
 
 	else strcpy(value, _value);
-
-	checkAmp(value); //저장한 문자열에 &quot; 같은 것이 있는지 검사
 }
 
 XMLNode* XMLNode::getParentNode()

@@ -38,7 +38,8 @@ public:
 	XMLNode* XpathRoute;
 	bool checkAlpha(const char ch);
 	bool checkNumber(const char ch);
-	int checkChar(const char* str, const char _ch);
+	int checkAnyChar(const char* str, const char _ch, const char _last);
+	char* checkAmp(char* str);
 	bool checkByteOrderMark();
 	int parser(const char* fileName, XMLNode* _XMLNode);
 	void parserPI();

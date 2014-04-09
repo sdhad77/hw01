@@ -44,19 +44,71 @@ bool XMLParser::checkNumber(const char ch)
 	else return false;
 }
 
-int XMLParser::checkChar(const char* str, const char _ch)
+int XMLParser::checkAnyChar(const char* str, const char _ch, const char _last)
 {
 	int _idx = 0;
-	while (str[_idx] != '\0')
+	while (str[_idx] != _last)
 	{
 		if(str[_idx] == _ch) return _idx;
 		_idx++;
 	}
 
 	if(_ch == '>') return -1; // >태그가 등장하지 않았을 경우, 다음 라인을 추가로 읽어오기 위해 존재함.
+	if(_ch == '&') return -2; //&quot; 등을 검사하는 checkAmp() 함수에서 벗어나기 위해 존재함.
 	if(_ch == '"') return -3; // "기호가 아닌 '기호로 시작되는 attribute value를 검사하기 위함.
 
 	return _idx;
+}
+
+//문자열str에 &quot;와 같은 Entity들을 검사하고 바꿔주는 함수.
+//이 함수를 거치면 &quot; -> " 이런 형태로 문자가 바뀜.
+char* XMLParser::checkAmp(char* str)
+{
+	int _idx = checkAnyChar(str, '&','\0');
+	if(_idx == -2) return str;
+
+	int ampEnd;
+	int charEnd;
+
+	while(1)
+	{
+		//aaa&quot;bbb -> 기본 형태. &quot;을 예제로 설명.
+		char* tempCheckAmp = new char[MAX_CHAR_SIZE];
+		char* tempCheckAmp2 = new char[MAX_CHAR_SIZE];
+
+		ampEnd	= checkAnyChar(str, ';', '\0');	//;가 존재하는지 검사
+		charEnd	= checkAnyChar(str, '\0', '\0');//문자열 끝나는 지점 검사
+
+		strncpy(tempCheckAmp, &str[_idx+1], ampEnd -_idx - 1); //&quot; -> quot 만 따로 저장
+		tempCheckAmp[ampEnd -_idx - 1] = '\0';	//quot 뒤에 \0 붙여줌
+
+		strncpy(tempCheckAmp2, &str[ampEnd+1], charEnd-ampEnd);  //bbb만 분리
+
+		//문자열에서 &와 ;사이에 있던 문자열이 무엇인지 검사 후 기호로 변경
+		if(!strcmp(tempCheckAmp, "lt"))			str[_idx] = '<';
+		else if(!strcmp(tempCheckAmp, "gt"))	str[_idx] = '>';
+		else if(!strcmp(tempCheckAmp, "amp"))	str[_idx] = '&';
+		else if(!strcmp(tempCheckAmp, "apos"))	str[_idx] = '\'';
+		else if(!strcmp(tempCheckAmp, "quot"))	str[_idx] = '"';
+		else
+		{
+			std::cout << "존재하지 않는 Entity입니다." << std::endl;
+			std::cout << str << std::endl;
+			break;
+		}
+
+		//기호로 변경한 문자 바로 뒤에 아까 분리한 bbb 부분을 이어 붙임
+		strncpy(&str[_idx+1], tempCheckAmp2, charEnd-ampEnd);
+
+		delete[] tempCheckAmp;
+		delete[] tempCheckAmp2;
+
+		//남은 문자열에서 &가 있는지 검사하고, 없을경우 break; 기호로 수정한 이후의 문자열을 검사하기 때문에 &amp; -> &변환에 대해 안전함
+		if(checkAnyChar(&str[_idx+1], '&', '\0') == -2) break;
+		_idx = _idx + checkAnyChar(&str[_idx+1], '&', '\0') + 1;//새로운 & 시작점을 찾아서 _idx에 저장
+	}
+
+	return str;
 }
 
 bool XMLParser::checkByteOrderMark()
@@ -92,9 +144,10 @@ void XMLParser::parserComment()
 
 void XMLParser::parserStartTag()
 {
-	int blankNum = checkChar(&tempBuf[0], ' ');
+	int blankNum = checkAnyChar(&tempBuf[0], ' ', '\0');
 	strncpy(tempElement, &tempBuf[0], blankNum);
 	tempElement[blankNum] = '\0';
+	checkAmp(tempElement);
 
 	isEmptyTag = false;
 	if(tempBuf[endIdx-1] == '/') isEmptyTag = true;
@@ -126,7 +179,7 @@ void XMLParser::parserEndTag()
 
 void XMLParser::parserContent()
 {
-	endIdx = checkChar(&buf[idx], '<');
+	endIdx = checkAnyChar(&buf[idx], '<', '\0');
 	strncpy(tempBuf, &buf[idx], endIdx);
 	tempBuf[endIdx] = '\0';
 	idx = idx + endIdx;
@@ -143,18 +196,20 @@ void XMLParser::parserAttribute(int _blankNum)
 		{
 			XMLNode tempAttribute;
 			int _startIdx = _blankNum;
-			int _endIdx = checkChar(&tempBuf[_startIdx], '=');
+			int _endIdx = checkAnyChar(&tempBuf[_startIdx], '=', '\0');
 
 			strncpy(tempAttributeName, &tempBuf[_startIdx], _endIdx);
 			tempAttributeName[_endIdx] = '\0';
+			checkAmp(tempAttributeName);
 			tempAttribute.setName(tempAttributeName);
 
 			_startIdx = _startIdx + _endIdx + 2;
-			_endIdx = checkChar(&tempBuf[_startIdx], '"');
-			if(_endIdx == -3) _endIdx = checkChar(&tempBuf[_startIdx], '\'');
+			_endIdx = checkAnyChar(&tempBuf[_startIdx], '"', '\0');
+			if(_endIdx == -3) _endIdx = checkAnyChar(&tempBuf[_startIdx], '\'', '\0');
 
 			strncpy(tempAttributeValue, &tempBuf[_startIdx], _endIdx);
 			tempAttributeValue[_endIdx] = '\0';
+			checkAmp(tempAttributeValue);
 			tempAttribute.setValue(tempAttributeValue);
 
 			XpathRoute->setAttribute(&tempAttribute);
@@ -196,12 +251,12 @@ int XMLParser::parser(const char* fileName, XMLNode* _XMLNode)
 			{
 				idx++;
 				startIdx = idx;
-				endIdx = checkChar(&buf[startIdx], '>');
+				endIdx = checkAnyChar(&buf[startIdx], '>', '\0');
 				while(endIdx == -1)
 				{
 					fin.getline(tempBuf, MAX_BUF_SIZE);
 					strcat(buf,tempBuf);
-					endIdx = checkChar(&buf[startIdx], '>');
+					endIdx = checkAnyChar(&buf[startIdx], '>', '\0');
 				}
 				strncpy(tempBuf, &buf[startIdx], endIdx);
 				tempBuf[endIdx] = '\0';

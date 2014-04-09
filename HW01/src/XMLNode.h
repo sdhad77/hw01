@@ -30,9 +30,6 @@ private:
 	std::list<XMLNode> childNode;
 
 public:
-	int checkAnyChar(const char* str, const char _ch, const char _last);
-	char* checkAmp(char* str);
-
 	char* getName();
 	void setName(const char* _tagName);
 	char* getValue();
