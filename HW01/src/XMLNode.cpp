@@ -35,21 +35,6 @@ XMLNode::~XMLNode() {
 	delete[] value;
 }
 
-char* XMLNode::getName()
-{
-	return name;
-}
-
-void XMLNode::setName(const char* _name)
-{
-	strcpy(name, _name);
-}
-
-char* XMLNode::getValue()
-{
-	return value;
-}
-
 void XMLNode::setValue(const char* _value)
 {
 	//저장할 문자열이 한 줄이 아니라 여러줄에 걸쳐 작성되었을때 한칸 띄우고 붙여서 저장하기 위함.
@@ -60,45 +45,6 @@ void XMLNode::setValue(const char* _value)
 	}
 
 	else strcpy(value, _value);
-}
-
-XMLNode* XMLNode::getParentNode()
-{
-	return parentNode;
-}
-void XMLNode::setParentNode(XMLNode* _parentNode)
-{
-	parentNode = _parentNode;
-}
-
-std::list<XMLNode>* XMLNode::getChildNode()
-{
-	return &childNode;
-}
-
-void XMLNode::setChildNode(const XMLNode* _childNode)
-{
-	childNode.push_back(*_childNode);
-}
-
-std::list<XMLNode>* XMLNode::getAttribute()
-{
-	return &attribute;
-}
-
-void XMLNode::setAttribute(const XMLNode* _attribute)
-{
-	attribute.push_back(*_attribute);
-}
-
-void XMLNode::PrintValue()
-{
-	std::cout << getValue() << std::endl;
-}
-
-void XMLNode::PrintName()
-{
-	std::cout << getName() << std::endl;
 }
 
 void XMLNode::PrintNode(PrintType _type)

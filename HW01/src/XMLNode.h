@@ -30,20 +30,21 @@ private:
 	std::list<XMLNode> childNode;
 
 public:
-	char* getName();
-	void setName(const char* _tagName);
-	char* getValue();
-	void setValue(const char* _content);
-	XMLNode* getParentNode();
-	void setParentNode(XMLNode* _parentNode);
-	std::list<XMLNode>* getChildNode();
-	void setChildNode(const XMLNode* _childNode);
-	std::list<XMLNode>* getAttribute();
-	void setAttribute(const XMLNode* _attribute);
+	char* getValue() {return value;}
+	char* getName() {return name;}
+	XMLNode* getParentNode() {return parentNode;}
+	std::list<XMLNode>* getChildNode() {return &childNode;}
+	std::list<XMLNode>* getAttribute() {return &attribute;}
 
-	void PrintValue();
-	void PrintName();
+	void setValue(const char* _value);
+	void setName(const char* _name) {strcpy(name, _name);}
+	void setParentNode(XMLNode* _parentNode) {parentNode = _parentNode;}
+	void setChildNode(const XMLNode* _childNode) {childNode.push_back(*_childNode);}
+	void setAttribute(const XMLNode* _attribute) {attribute.push_back(*_attribute);}
+
 	void PrintNode(PrintType _type);
+	void PrintName() {std::cout << name << std::endl;}
+	void PrintValue() {std::cout << value << std::endl;}
 };
 
 #endif /* XMLNODE_H_ */
